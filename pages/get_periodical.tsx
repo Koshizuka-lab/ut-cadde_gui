@@ -29,7 +29,7 @@ export default function DataExchangePeriodical() {
         <Text fontSize="lg" my="1rem">
           契約先法人一覧
         </Text>
-        {providers.map((provider) => (<Provider tag="period" provider={provider}/>))}
+        {providers.map((provider) => (<Provider key="" tag="period" provider={provider}/>))}
       </Box>
     </Layout>
   )

@@ -1,5 +1,4 @@
-import { Box, Flex, VStack } from "@chakra-ui/react";
-import { ReactNode } from "react";
+import { Flex, VStack } from "@chakra-ui/react";
 import { SimpleSidebar } from "./Sidebar";
 import Header from "./Header";
 import Head from "next/head";
@@ -9,7 +8,7 @@ const Layout = ({ children }) => {
     <>
       <Head>
           <title>UT-CADDE</title>
-          <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" crossorigin="anonymous"></link>
+          <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" crossOrigin="anonymous"></link>
       </Head>
       <VStack w="100%" overflowY="scroll">
         <Header />

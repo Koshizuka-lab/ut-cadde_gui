@@ -7,7 +7,7 @@ export default function Search() {
   
     return (
         <Layout >
-           <MetaSearch test={true}/>
+           <MetaSearch />
         </Layout>
     )
 }

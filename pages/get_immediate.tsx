@@ -1,5 +1,4 @@
 import Layout from "../components/Layout"
-import Link from "next/link"
 import React, { useState, useEffect } from 'react'
 import Provider from "../components/Provider"
 import {
@@ -25,12 +24,12 @@ export default function DataExchangeImmediate() {
     <Layout >
       <Box>
         <Heading as="h1" size="xl" my="1rem">
-          即時データ取得
-        </Heading>
-        <Text fontSize="lg" my="1rem">
           契約先法人一覧
-        </Text>
-        {providers.map((provider) => (<Provider tag="immed" provider={provider}/>))}
+        </Heading>
+        {/* <Text fontSize="lg" my="1rem">
+          契約先法人一覧
+        </Text> */}
+        {providers.map((provider) => (<Provider key="" tag="immed" provider={provider}/>))}
       </Box>
     </Layout>
   )

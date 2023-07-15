@@ -1,13 +1,20 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Download from './Download'
+import { Distribution } from '../types'
 
-function Distribution (props) {
+interface DistributionProps {
+    tag: string
+    distribution: Distribution
+}
+
+function Distribution (props: DistributionProps) {
     let distribution = props.distribution
 
     if (props.tag == "immed") {
         return (
             <tr>
-                <td>{distribution.name}</td>
+                <td>{distribution.title}</td>
+                <td>{distribution.resource_name}</td>
                 <td>{distribution.data_type}</td>
                 <td>{distribution.updated_time}</td>
                 <td>
@@ -15,18 +22,15 @@ function Distribution (props) {
                         <a href="example.com" target="_blank">契約内容</a>
                     </button>
                 </td>
-                <td><Download test={true}/></td>
+                <td><Download url="./data.json" resourceUrl="" resourceType="" pID="" token=""/></td>
             </tr>
         )
     } else if (props.tag == "period") {
         return (
             <tr>
-                <td>{distribution.name}</td>
+                <td>{distribution.title}</td>
                 <td>{distribution.data_type}</td>
-                <td>
-                    <input type="text" value={distribution.transfer_url}></input>
-                </td>
-                <td>{distribution.often}</td>
+                <td>{distribution.resource_name}</td>
             </tr>
         )
     }

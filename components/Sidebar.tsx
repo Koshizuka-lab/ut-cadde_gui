@@ -4,14 +4,12 @@ import {
   Box,
   CloseButton,
   Flex,
-  Icon,
   useColorModeValue,
   Link,
   Text,
   useDisclosure,
   BoxProps,
   FlexProps,
-  LinkProps,
   Stack,
   Drawer,
   DrawerHeader,
@@ -21,19 +19,16 @@ import {
   DrawerCloseButton,
   Button,
 } from "@chakra-ui/react";
-import { FiHome, FiMail, FiTrendingUp } from "react-icons/fi";
-import { IconType } from "react-icons";
 
-// interface LinkItemProps {
-//   name: string;
-//   icon: IconType;
-//   link: string;
-// }
-const LinkItems = [
+interface LinkItemProps {
+  name: string;
+  link: string;
+}
+const LinkItems: Array<LinkItemProps> = [
   { name: "Home", link: "/" },
   { name: "データ検索", link: "/search" },
-  { name: "即時データ取得", link: "/get_immediate" },
-  { name: "定期データ取得", link: "/get_periodical" },
+  { name: "データ取得", link: "/get_immediate" },
+  // { name: "定期データ取得", link: "/get_periodical" },
 ];
 
 export const SimpleSidebar = () => {
@@ -52,11 +47,11 @@ export const SimpleSidebar = () => {
   );
 };
 
-// interface SidebarProps extends BoxProps {
-//   onClose: () => void;
-// }
+interface SidebarProps extends BoxProps {
+  onClose: () => void;
+}
 
-const SidebarContent = ({ onClose, ...rest }) => {
+const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   return (
     <Box
       bg={useColorModeValue("white", "gray.900")}
@@ -81,12 +76,11 @@ const SidebarContent = ({ onClose, ...rest }) => {
   );
 };
 
-// interface NavItemProps extends FlexProps {
-//   icon: IconType;
-//   children: ReactNode;
-//   link: string;
-// }
-const NavItem = ({ icon, children, link, ...rest }) => {
+interface NavItemProps extends FlexProps {
+  children: ReactNode;
+  link: string;
+}
+const NavItem = ({ children, link, ...rest }: NavItemProps) => {
   return (
     <Link
       style={{ textDecoration: "none" }}
@@ -101,21 +95,11 @@ const NavItem = ({ icon, children, link, ...rest }) => {
         role="group"
         cursor="pointer"
         _hover={{
-          bg: "teal.300",
+          bg: "teal",
           color: "white",
         }}
         {...rest}
       >
-        {icon && (
-          <Icon
-            mr="4"
-            fontSize="16"
-            _groupHover={{
-              color: "white",
-            }}
-            as={icon}
-          />
-        )}
         {children}
       </Flex>
     </Link>

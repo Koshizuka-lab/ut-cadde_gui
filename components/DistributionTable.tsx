@@ -1,9 +1,15 @@
 import React from 'react'
 import Distribution from './Distribution'
 
-export default function DistributionTable(props) {
+interface DistributionTableProps {
+    tag: string
+    distributions: any
+}
+
+export default function DistributionTable(props: DistributionTableProps) {
     const headers_immed = (
         <tr>
+            <th>データセット名</th>
             <th>配信名</th>
             <th>データ形式</th>
             <th>最終更新日</th>
@@ -13,6 +19,7 @@ export default function DistributionTable(props) {
     )
     const headers_period = (
         <tr>
+            <th>データセット名</th>
             <th>配信名</th>
             <th>データ形式</th>
             <th>転送先URL</th>
@@ -27,7 +34,7 @@ export default function DistributionTable(props) {
                 {props.tag == "period" && headers_period}
             </thead>
             <tbody>
-                {props.distributions.map((distribution) => (<Distribution tag={props.tag} distribution={distribution}/>))}
+                {props.distributions.map((distribution) => (<Distribution key="" tag={props.tag} distribution={distribution}/>))}
             </tbody>
         </table>
     )
