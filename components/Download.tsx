@@ -1,14 +1,20 @@
 import React from 'react'
+import { useState } from "react";
+import { useContext } from "react";
+import { AuthToken } from "../pages/_app";
+import { Input, Button, FormControl, Flex, Spacer, AlertDialog, useDisclosure, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter } from "@chakra-ui/react"
+import internal from 'stream';
 
 interface DownloadProps {
-    url: string,
-    resourceUrl: string,
-    resourceType: string,
-    pID: string,
-    token: string,
+    caddec_dataset_id_for_detail: string,
+    provider_id: string,
+    resource_name: string
 }
 
 function Download(props: DownloadProps) {
+    const { token, setToken } = useContext(AuthToken)
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const cancelRef = React.useRef()
     
     const downloadFile = ((blob, filename) => {
         const url = URL.createObjectURL(blob);
@@ -22,40 +28,90 @@ function Download(props: DownloadProps) {
         document.body.removeChild(a);
     })
 
+    const Alert = ((message: string) => {
+        return (
+            <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+                >   
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogBody>
+                        { message }
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter>
+                        <Button ref={cancelRef} onClick={onClose}>
+                            閉じる
+                        </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                    </AlertDialogOverlay>
+            </AlertDialog>
+        )
+    })
+
     const doAction = (e) => {
         e.preventDefault()
-        let filename = props.url.split("/").pop()
-        // ファイルの取得とダウンロード
-        console.log(props.url, filename)
-        fetch(props.url, {
+        fetch("/api/detailcatalog?q=" + props.caddec_dataset_id_for_detail, {
             method: "GET", 
             headers: {
-                'Cache-Control': 'no-cache',
-                'x-cadde-resource-url': props.resourceUrl,
-                'x-cadde-resource-api-type': props.resourceType,
-                'x-cadde-provider': props.pID,
-                'Authorization:Bearer': props.token
+                "Content-Type": "application/json",
+                "provider_id": props.provider_id,
+                "token": token
             },
-        }).then((res) => res.blob())
-        .then(
-            blob => {
-                downloadFile(blob, filename)
+        })
+        .then((res) => res.json())
+        .then((json) => {
+            console.log(json)
+            var resource_url = ""
+            for (var i = 0; i < json["result"]["results"][0]["resources"].length; i++) {
+                if (json["result"]["results"][0]["resources"][i]["name"] == props.resource_name) {
+                    resource_url = json["result"]["results"][0]["resources"][i]["url"]
+                    break
+                }
             }
-        ).catch(error => {
-            console.log("Cannot fetch from API. Try to fetch from local server.")
-            fetch(props.url, {
-                method: "GET", 
-            }).then((res) => res.blob())
+            let resource_api_type = "file/http"
+            console.log("get data")
+            return fetch("/api/providers_immediate", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "provider_id": props.provider_id,
+                    "token": token,
+                    "resource_url": resource_url,
+                    "resource_api_type": resource_api_type
+                    }
+            }).then((res) => {
+                return res.blob()
+            })
             .then(
                 blob => {
-                    downloadFile(blob, filename)
+                    downloadFile(blob, props.resource_name)
                 }
-            )
+            ).catch((error) => {
+                console.log(error)
+                onOpen()
+            })
+        }).catch((error) => {
+            console.log(error)
+            onOpen()
         })
     }
 
     return (
-        <button onClick={doAction} className="btn btn-primary btn">ダウンロード</button>
+        <div>
+            <Button 
+                onClick={doAction}
+                colorScheme="teal"
+                variant="outline"
+                size="sm"
+                >
+                ダウンロード
+            </Button>
+            { Alert("ダウンロードに失敗しました")}
+        </div>
     )
 }
 

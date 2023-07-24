@@ -15,6 +15,7 @@ export default function DataExchangeImmediate() {
     fetch('/api/providers_immediate')
       .then(res => res.json())
       .then(data => {
+        console.log(data)
         setProviders(data)
       })
   }, [])

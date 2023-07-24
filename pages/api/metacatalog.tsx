@@ -13,6 +13,9 @@ function preprocess(json: Catalog, query: string): Array<Distribution> {
         resource_name: '',
         data_type: '',
         updated_time: '',
+        description: '',
+        caddec_provider_id: '',
+        caddec_dataset_id_for_detail: '',
         url: ''
       }
       tmp["title"] = results[i]["title"]
@@ -24,6 +27,10 @@ function preprocess(json: Catalog, query: string): Array<Distribution> {
       } else {
         tmp["updated_time"] = results[i]["resources"][j]["created"].slice(0, 10)
       }
+      tmp["description"] = results[i]["resources"][j]["description"]
+      console.log(results[i]["extras"])
+      tmp["caddec_provider_id"] = results[i]["extras"][1]["value"]
+      tmp["caddec_dataset_id_for_detail"] = results[i]["extras"][0]["value"]
       tmp["url"] = results[i]["resources"][j]["url"]
       if (tmp["title"].indexOf(query) >= 0) {
         ret_data.push(tmp)

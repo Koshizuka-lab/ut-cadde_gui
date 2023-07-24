@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Distribution } from '../types'
-
+import Download from './Download'
+import { Input, Button, FormControl, Flex, Spacer, Box} from "@chakra-ui/react"
+import Dataset from './Dataset'
 
 function MetaSearch() {
     const [url, setUrl] = useState("")
@@ -13,27 +15,40 @@ function MetaSearch() {
     const RowItem = ((data: Distribution) => {
         return (
             <tr>
-                <td>{data["title"]}</td>
+                {/* <td>{data["title"]}</td> */}
                 <td>{data["resource_name"]}</td>
                 <td>{data["provider_name"]}</td>
                 <td>{data["data_type"]}</td>
                 <td>{data["updated_time"]}</td>
+                <td>{data["description"]}</td>
                 <td>
-                    <button className="btn btn-secondary btn">
-                        <a href={data["url"]} target="_blank">詳細</a>
-                    </button>
+                    <Download 
+                        caddec_dataset_id_for_detail={data["caddec_dataset_id_for_detail"]} 
+                        provider_id={data["caddec_provider_id"]}
+                        resource_name={data["resource_name"]}
+                    />
                 </td>
             </tr>
         )
     })
 
     const createTable = (res: Array<Distribution>) => {
+        console.log(res)
         // 表データの作成
         let arr = []
+        let datasetArr = []
+        let dataset_name = res[Object.keys(res)[0]]["title"]
         for (var key in Object.keys(res)) {
+            if (res[key]["title"] != dataset_name) {
+                datasetArr.push(<Dataset title={dataset_name} distributions={arr}/>)
+                arr = []
+            }
             arr.push(RowItem(res[key]))
+            dataset_name = res[key]["title"]
         }
-        setDataArr(arr)
+        datasetArr.push(<Dataset title={dataset_name} distributions={arr}/>)
+        
+        setDataArr(datasetArr)
     }
 
     const doAction = (e) => {
@@ -50,35 +65,26 @@ function MetaSearch() {
     return (
         <div>
             <h1 className='card-title'>データ検索</h1>
-                <div className='container'>
-                    <form onSubmit={doAction}>
-                        <div className='form-row'>
-                            <div className='form-group mr-1 col-5'>
-                                <label className="form-label">検索ワード</label>
-                                <input type="text" className='form-control' onChange={doChange} required placeholder=""/>  
-                            </div>
-                            <div className='form-group'>
-                                <label className="form-label">　</label>
-                                <input type="submit" className="btn btn-primary btn" value="検索"/>
-                            </div>
-                        </div>
-                    </form>
-                    <table className='table'>
-                        <thead>
-                            <tr>
-                                <th>データセット名</th>
-                                <th>配信名</th>
-                                <th>提供者</th>
-                                <th>データ形式</th>
-                                <th>最終更新日</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {dataArr}
-                        </tbody>
-                    </table>
-                </div>            
+
+                <Flex minWidth="max-content" alignItems="center" gap="2" pb="10">
+                    <FormControl p="2">
+                        <Input
+                            onChange={doChange}
+                            placeholder="検索ワード"
+                        />
+                    </FormControl>
+                    <Spacer />
+                    <Button
+                        type="submit"
+                        variant="solid"
+                        colorScheme="teal"
+                        width="sm"
+                        onClick={doAction}
+                    >
+                        検索
+                    </Button>
+                </Flex>
+                {dataArr}
         </div>
     )
 }

@@ -4,7 +4,7 @@ export default function login(req, res) {
     const userID = req.body.userID
     const password = req.body.password
 
-    fetch("http://172.26.16.20:18080/cadde/api/v4/token", {
+    fetchHttps("https://172.26.16.20:18443/cadde/api/v4/token", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -4,6 +4,9 @@ export interface Distribution {
   resource_name: string,
   data_type: string,
   updated_time: string,
+  description: string,
+  caddec_provider_id: string,
+  caddec_dataset_id_for_detail: string,
   url: string
 }
   

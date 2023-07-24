@@ -18,11 +18,8 @@ import {
   InputRightElement
 } from "@chakra-ui/react";
 
-interface LoginProps {
-  setShowLoginBox: (showLoginBox: boolean) => void
-}
 
-function Login(props: LoginProps) {
+function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [userID, setUserID] = useState("")
   const [password, setPassword] = useState("")
@@ -49,7 +46,6 @@ function Login(props: LoginProps) {
     .then(data => {
         console.log(data)
         setToken(data["access_token"])
-        props.setShowLoginBox(false)
     })
   }
 

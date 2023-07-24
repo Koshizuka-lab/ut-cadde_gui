@@ -1,6 +1,12 @@
 import fetch from 'node-fetch'
 
 const fetchHttps = (url, options) => {
+    console.log("--- fetchHttps ---")
+    console.log("url: " + url)
+    console.log("method: " + options["method"])
+    for (const key in options['headers']) {
+        console.log("key: " + key + ", value: " + options["headers"][key])
+    }
     const https = require('https')
     const fs = require('fs')
 

@@ -16,31 +16,22 @@ import {
   } from "@chakra-ui/react";
 import Login from "../components/Login";
 import { useState } from "react";
+import MetaSearch from "./MetaSearch";
+import { useContext } from "react";
+import { AuthToken } from "../pages/_app";
 
 export default function Home() {
-    const [showLoginBox, setShowLoginBox] = useState(true)
+    const { token, setToken } = useContext(AuthToken)
 
     let box = <div />
-    if (showLoginBox) {
-        box = <Login setShowLoginBox={setShowLoginBox}/>
+    if (!token) {
+        box = <Login />
     } else {
-        box = (
-            <Flex flexDirection="row" align="center">
-                <Link href="/search">
-                    <Button size="lg" margin="5">
-                        データ検索
-                    </Button>
-                </Link>
-                    <Link href="/get_immediate">
-                    <Button size="lg" margin="5">
-                        データ取得
-                    </Button>
-                </Link>
-            </Flex>  
-        )
+        box = <MetaSearch />
     }
 
     return (
+        <div>
         <Stack align="center">
             <Box
               color="blackAlpha.700"
@@ -49,7 +40,8 @@ export default function Home() {
             >
               UT-CADDE
             </Box>
-            { box }
         </Stack>
+            <Box>{ box }</Box>
+        </div>
     )
 }

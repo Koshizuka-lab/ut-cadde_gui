@@ -1,40 +1,29 @@
 import React from 'react'
-import Distribution from './Distribution'
+import { Distribution } from "../types"
 
 interface DistributionTableProps {
-    tag: string
-    distributions: any
+    distributions: Array<Distribution>
 }
 
 export default function DistributionTable(props: DistributionTableProps) {
-    const headers_immed = (
+    const headers = (
         <tr>
-            <th>データセット名</th>
             <th>配信名</th>
+            <th>提供者</th>
             <th>データ形式</th>
             <th>最終更新日</th>
+            <th>説明</th>
             <th></th>
-            <th></th>
-        </tr>
-    )
-    const headers_period = (
-        <tr>
-            <th>データセット名</th>
-            <th>配信名</th>
-            <th>データ形式</th>
-            <th>転送先URL</th>
-            <th>取得頻度</th>
         </tr>
     )
 
     return (
         <table className="table table-striped">
             <thead>
-                {props.tag == "immed" && headers_immed}
-                {props.tag == "period" && headers_period}
+                {headers}
             </thead>
             <tbody>
-                {props.distributions.map((distribution) => (<Distribution key="" tag={props.tag} distribution={distribution}/>))}
+                {props.distributions}
             </tbody>
         </table>
     )
