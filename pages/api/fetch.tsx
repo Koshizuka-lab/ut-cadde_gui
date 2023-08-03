@@ -11,7 +11,7 @@ const fetchHttps = (url, options) => {
     const fs = require('fs')
 
     // カスタム証明書を読み込む
-    const customCert = fs.readFileSync('./cacert.pem')
+    const customCert = fs.readFileSync(process.env.ROOT_CA_CERTIFICATE)
     const agent = new https.Agent({
         ca: customCert
     })
