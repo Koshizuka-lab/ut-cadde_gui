@@ -42,7 +42,7 @@ function Download(props: DownloadProps) {
 
                         <AlertDialogFooter>
                         <Button ref={cancelRef} onClick={onClose}>
-                            閉じる
+                            Close
                         </Button>
                         </AlertDialogFooter>
                     </AlertDialogContent>
@@ -107,9 +107,9 @@ function Download(props: DownloadProps) {
                 variant="outline"
                 size="sm"
                 >
-                ダウンロード
+                Download
             </Button>
-            { Alert("ダウンロードに失敗しました")}
+            { Alert("Download failed")}
         </div>
     )
 }

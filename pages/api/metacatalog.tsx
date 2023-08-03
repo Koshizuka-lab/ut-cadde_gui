@@ -54,7 +54,8 @@ export default function metacatalog(req: NextApiRequest, res: NextApiResponse) {
   .then(res  => res.json())
   .then(data => {
     console.log(data)
-    res.status(200).json(preprocess(data, query))
+    const _data: Catalog = data as Catalog
+    res.status(200).json(preprocess(_data, query))
   })
   .catch(error => {
     console.log(error)

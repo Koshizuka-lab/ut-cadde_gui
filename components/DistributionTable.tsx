@@ -1,18 +1,15 @@
 import React from 'react'
 import { Distribution } from "../types"
 
-interface DistributionTableProps {
-    distributions: Array<Distribution>
-}
 
-export default function DistributionTable(props: DistributionTableProps) {
+export default function DistributionTable(props) {
     const headers = (
         <tr>
-            <th>配信名</th>
-            <th>提供者</th>
-            <th>データ形式</th>
-            <th>最終更新日</th>
-            <th>説明</th>
+            <th>Distribution Title</th>
+            <th>Provider</th>
+            <th>Data Type</th>
+            <th>Last Updated Time</th>
+            <th>Description</th>
             <th></th>
         </tr>
     )

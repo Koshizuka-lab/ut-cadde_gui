@@ -63,13 +63,13 @@ function MetaSearch() {
 
     return (
         <div>
-            <h1 className='card-title'>データ検索</h1>
+            <h1 className='card-title'>Search data</h1>
 
                 <Flex minWidth="max-content" alignItems="center" gap="2" pb="10">
                     <FormControl p="2">
                         <Input
                             onChange={doChange}
-                            placeholder="検索ワード"
+                            placeholder="search word"
                         />
                     </FormControl>
                     <Spacer />
@@ -80,7 +80,7 @@ function MetaSearch() {
                         width="sm"
                         onClick={doAction}
                     >
-                        検索
+                        Search
                     </Button>
                 </Flex>
                 {dataArr}
