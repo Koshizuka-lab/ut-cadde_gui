@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import DistributionTable from './DistributionTable'
+import DistributionTable from '../DistributionTable'
 
 
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Distribution } from '../types'
 import Download from './Download'
-import { Input, Button, FormControl, Flex, Spacer, Box} from "@chakra-ui/react"
+import { Input, Button, FormControl, Flex, Spacer } from "@chakra-ui/react"
 import Dataset from './Dataset'
 
 function MetaSearch() {
@@ -15,7 +15,6 @@ function MetaSearch() {
     const RowItem = ((data: Distribution) => {
         return (
             <tr>
-                {/* <td>{data["title"]}</td> */}
                 <td>{data["resource_name"]}</td>
                 <td>{data["provider_name"]}</td>
                 <td>{data["data_type"]}</td>

@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useContext } from "react";
 import { AuthToken } from "../pages/_app";
 import { Input, Button, FormControl, Flex, Spacer, AlertDialog, useDisclosure, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter } from "@chakra-ui/react"
-import internal from 'stream';
 
 interface DownloadProps {
     caddec_dataset_id_for_detail: string,

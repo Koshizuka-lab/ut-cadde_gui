@@ -1,6 +1,6 @@
 import Layout from "../components/Layout"
 import React, { useState, useEffect } from 'react'
-import Provider from "../components/Provider"
+import Provider from "../components/olds/Provider"
 import {
   Text,
   Box,

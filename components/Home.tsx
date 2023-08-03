@@ -1,21 +1,5 @@
-import {
-    Flex,
-    Heading,
-    Input,
-    Button,
-    InputGroup,
-    Stack,
-    InputLeftElement,
-    chakra,
-    Box,
-    Link,
-    Avatar,
-    FormControl,
-    FormHelperText,
-    InputRightElement
-  } from "@chakra-ui/react";
+import { Stack, Box } from "@chakra-ui/react";
 import Login from "../components/Login";
-import { useState } from "react";
 import MetaSearch from "./MetaSearch";
 import { useContext } from "react";
 import { AuthToken } from "../pages/_app";
@@ -23,12 +7,7 @@ import { AuthToken } from "../pages/_app";
 export default function Home() {
     const { token, setToken } = useContext(AuthToken)
 
-    let box = <div />
-    if (!token) {
-        box = <Login />
-    } else {
-        box = <MetaSearch />
-    }
+    const box = (token ? <MetaSearch /> : <Login />)
 
     return (
         <div>
