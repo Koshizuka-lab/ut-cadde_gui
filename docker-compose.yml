@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - ./cacert.pem:/etc/docker/certs.d/cacert.pem
+    command: sh -c "npm run dev"
+    environment:
+      - ROOT_CA_CERTIFICATE=/etc/docker/certs.d/cacert.pem
+volumes:
+  node_modules:
