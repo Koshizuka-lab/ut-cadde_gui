@@ -1,11 +1,8 @@
 import React from 'react'
 import { Distribution } from "../types"
 
-interface DistributionTableProps {
-    distributions: Array<Distribution>
-}
 
-export default function DistributionTable(props: DistributionTableProps) {
+export default function DistributionTable(props) {
     const headers = (
         <tr>
             <th>Distribution Title</th>
