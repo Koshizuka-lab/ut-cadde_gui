@@ -29,8 +29,8 @@ function Dataset(props: DatasetProps) {
                 <Box p="2">
                     {
                         isExpanded 
-                        ? <Button onClick={doAction}>閉じる</Button> 
-                        : <Button onClick={doAction}>配信を表示</Button>
+                        ? <Button onClick={doAction}>Close</Button> 
+                        : <Button onClick={doAction}>Show distributions</Button>
                     }
                 </Box>
             </Flex>
