@@ -1,101 +1,99 @@
 import React from 'react'
-import { useState } from "react";
-import { useContext } from "react";
-import { AuthToken } from "../pages/_app";
-import { Input, Button, FormControl, Flex, Spacer, AlertDialog, useDisclosure, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter } from "@chakra-ui/react"
+import { useContext, useState } from "react";
+import { LoginUser } from "../pages/_app";
+import { Button } from "@chakra-ui/react"
+import { Catalog, UserContext } from '../types';
+import Alert, { AlertMessage } from "../components/Alert";
+
 
 interface DownloadProps {
-    caddec_dataset_id_for_detail: string,
-    provider_id: string,
-    resource_name: string
+    caddecDatasetIdForDetail: string,
+    providerId: string,
+    resourceName: string
 }
-
 function Download(props: DownloadProps) {
-    const { token, setToken } = useContext(AuthToken)
-    const { isOpen, onOpen, onClose } = useDisclosure()
-    const cancelRef = React.useRef()
+    const { user, setUser }: UserContext = useContext(LoginUser)
+    const [alertMessage, setAlertMessage] = useState({header: "", body: ""} as AlertMessage)
+
+    const onOpenDialog = (message: AlertMessage) => {
+        setAlertMessage(message)
+      }
     
-    const downloadFile = ((blob, filename) => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-    })
+    const onCloseDialog = () => {
+        setAlertMessage({header: "", body: ""})
+    }
 
-    const Alert = ((message: string) => {
-        return (
-            <AlertDialog
-                isOpen={isOpen}
-                leastDestructiveRef={cancelRef}
-                onClose={onClose}
-                >   
-                <AlertDialogOverlay>
-                    <AlertDialogContent>
-                        <AlertDialogBody>
-                        { message }
-                        </AlertDialogBody>
+    const fetchDetailcatalog = async (): Promise<string> => {
+        console.log("fetch detailcatalog")
 
-                        <AlertDialogFooter>
-                        <Button ref={cancelRef} onClick={onClose}>
-                            Close
-                        </Button>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                    </AlertDialogOverlay>
-            </AlertDialog>
-        )
-    })
-
-    const doAction = (e) => {
-        e.preventDefault()
-        fetch("/api/detailcatalog?q=" + props.caddec_dataset_id_for_detail, {
+        let resourceUrl: string = ""
+        return fetch("/api/detailcatalog?q=" + props.caddecDatasetIdForDetail, {
             method: "GET", 
             headers: {
                 "Content-Type": "application/json",
-                "provider_id": props.provider_id,
-                "token": token
+                "provider_id": props.providerId,
+                "token": user.token
             },
         })
-        .then((res) => res.json())
-        .then((json) => {
-            console.log(json)
-            var resource_url = ""
-            for (var i = 0; i < json["result"]["results"][0]["resources"].length; i++) {
-                if (json["result"]["results"][0]["resources"][i]["name"] == props.resource_name) {
-                    resource_url = json["result"]["results"][0]["resources"][i]["url"]
+        .then((res: Response) => res.json())
+        .then((json: Catalog) => {
+            
+            // response from detailcatalog must be only one
+            if (json["result"]["results"].length != 1) {
+                onOpenDialog({header: "Internal server error", body: "Please contact to the administrator"})
+                throw new Error("fetch detail catalog failed")
+            }
+            
+            
+            let resources = json["result"]["results"][0]["resources"]
+            for (let resouce of resources) {
+                if (resouce["name"] == props.resourceName) {
+                    resourceUrl = resouce["url"]
                     break
                 }
             }
-            let resource_api_type = "file/http"
-            console.log("get data")
-            return fetch("/api/providers_immediate", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "provider_id": props.provider_id,
-                    "token": token,
-                    "resource_url": resource_url,
-                    "resource_api_type": resource_api_type
-                    }
-            }).then((res) => {
-                return res.blob()
-            })
-            .then(
-                blob => {
-                    downloadFile(blob, props.resource_name)
+            return resourceUrl
+        })
+    }
+
+    const fetchResource = async (resourceUrl: string): Promise<void> => {
+        console.log("fetch resource")
+        return fetch("/api/fetch_resource", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "provider_id": props.providerId,
+                "token": user.token,
+                "resource_url": resourceUrl,
+                "resource_api_type": "file/http"
                 }
-            ).catch((error) => {
-                console.log(error)
-                onOpen()
-            })
-        }).catch((error) => {
+        })
+        .then((res: Response) => {
+            if (!res.ok) {
+                throw new Error("fetch resouce failed")
+            } else {
+                return res.blob()
+            }       
+        })
+        .then((blob: Blob) => {
+            downloadFile(blob, props.resourceName)
+        })
+        
+    }
+
+    const doAction = (e) => {
+        e.preventDefault()
+        fetchDetailcatalog()
+        .catch((error) => {
             console.log(error)
-            onOpen()
+            onOpenDialog({header: "Access denied", body: "Please contact to data provider."})
+        })
+        .then((resourceUrl: string) => {
+            return fetchResource(resourceUrl)
+        })
+        .catch((error) => {
+            console.log(error)
+            onOpenDialog({header: "Download failed", body: "Please contact to data provider."})
         })
     }
 
@@ -104,14 +102,26 @@ function Download(props: DownloadProps) {
             <Button 
                 onClick={doAction}
                 colorScheme="teal"
-                variant="outline"
+                letiant="outline"
                 size="sm"
                 >
                 Download
             </Button>
-            { Alert("Download failed")}
+            { Alert(alertMessage, onCloseDialog)}
         </div>
     )
+}
+
+function downloadFile(blob: Blob, filename: string) {
+    const url: string = URL.createObjectURL(blob)
+    const a: HTMLAnchorElement = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.style.display = 'none'
+    document.body.appendChild(a)
+    a.click()
+    URL.revokeObjectURL(url)
+    document.body.removeChild(a)
 }
 
 export default Download

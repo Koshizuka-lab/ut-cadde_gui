@@ -8,12 +8,11 @@ const Layout = ({ children }) => {
     <>
       <Head>
           <title>UT-CADDE</title>
-          <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" crossOrigin="anonymous"></link>
       </Head>
       <VStack w="100%" overflowY="scroll">
         <Header />
-        <Flex w="100%">
-          <SimpleSidebar />
+        <Flex w="100%" mt="20">
+          <SimpleSidebar/>
           <Flex w={{ base: "80%" }} flexDirection="column" p="10">
             {children}
           </Flex>

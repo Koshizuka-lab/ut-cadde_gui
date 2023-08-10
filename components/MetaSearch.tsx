@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { Distribution } from '../types'
-import Download from './Download'
-import { Input, Button, FormControl, Flex, Spacer } from "@chakra-ui/react"
-import Dataset from './Dataset'
+import { Dataset } from '../types'
+import { Input, Button, FormControl, Flex, Spacer, Box } from "@chakra-ui/react"
+import DatasetBlock from './DatasetBlock'
+
 
 function MetaSearch() {
     const [url, setUrl] = useState("")
@@ -12,82 +12,60 @@ function MetaSearch() {
         setUrl("./api/metacatalog?q=" + e.target.value)
     }
 
-    const RowItem = ((data: Distribution) => {
-        return (
-            <tr>
-                <td>{data["resource_name"]}</td>
-                <td>{data["provider_name"]}</td>
-                <td>{data["data_type"]}</td>
-                <td>{data["updated_time"]}</td>
-                <td>{data["description"]}</td>
-                <td>
-                    <Download 
-                        caddec_dataset_id_for_detail={data["caddec_dataset_id_for_detail"]} 
-                        provider_id={data["caddec_provider_id"]}
-                        resource_name={data["resource_name"]}
-                    />
-                </td>
-            </tr>
-        )
-    })
-
-    const createTable = (res: Array<Distribution>) => {
-        console.log(res)
-        // 表データの作成
-        let arr = []
-        let datasetArr = []
-        let dataset_name = res[Object.keys(res)[0]]["title"]
-        for (var key in Object.keys(res)) {
-            if (res[key]["title"] != dataset_name) {
-                datasetArr.push(<Dataset title={dataset_name} distributions={arr}/>)
-                arr = []
-            }
-            arr.push(RowItem(res[key]))
-            dataset_name = res[key]["title"]
-        }
-        datasetArr.push(<Dataset title={dataset_name} distributions={arr}/>)
-        
-        setDataArr(datasetArr)
-    }
-
     const doAction = (e) => {
         e.preventDefault()
-        // データの取得
+        // clear data if search word is empty
+        if (url == "./api/metacatalog?q="){
+            setDataArr([])
+            return
+        }
+
         fetch(url, {method: "GET"})
         .then(res  => res.json())
         .then((json) => {
-            createTable(json)
+            displayDatasets(json)
             console.log(json)
         })
     }
 
-    return (
-        <div>
-            <h1 className='card-title'>Search data</h1>
+    const displayDatasets = (datasetArr: Array<Dataset>) => {
+        console.log(datasetArr)
+        if (datasetArr.length == 0) {
+            setDataArr([])
+            return
+        }
+        let newDataArr = []
+        for (let dataset of datasetArr) {
+            newDataArr.push(<DatasetBlock dataset={dataset} />)
+        }
+        
+        setDataArr(newDataArr)
+    }
 
-                <Flex minWidth="max-content" alignItems="center" gap="2" pb="10">
-                    <FormControl p="2">
-                        <Input
-                            onChange={doChange}
-                            placeholder="search word"
-                        />
-                    </FormControl>
-                    <Spacer />
-                    <Button
-                        type="submit"
-                        variant="solid"
-                        colorScheme="teal"
-                        width="sm"
-                        onClick={doAction}
-                    >
-                        Search
-                    </Button>
-                </Flex>
-                {dataArr}
-        </div>
+    return (
+        <Box>
+            <h1>Search data</h1>
+            <Flex minWidth="max-content" alignItems="center" gap="2" pb="10">
+                <FormControl p="2">
+                    <Input
+                        onChange={doChange}
+                        placeholder="search word"
+                    />
+                </FormControl>
+                <Spacer />
+                <Button
+                    type="submit"
+                    letiant="solid"
+                    colorScheme="teal"
+                    width="sm"
+                    onClick={doAction}
+                >
+                    Search
+                </Button>
+            </Flex>
+            {dataArr}
+        </Box>
     )
 }
-
-
 
 export default MetaSearch

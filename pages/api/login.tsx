@@ -1,6 +1,8 @@
-import { fetchHttps } from './fetch'
+import { LoginAuthResponse } from '../../types'
+import fetchHttps from './fetchHttps'
+import { NextApiRequest, NextApiResponse } from "next"
 
-export default function login(req, res) {
+export default function login(req: NextApiRequest, res: NextApiResponse) {
     const userID = req.body.userID
     const password = req.body.password
 
@@ -16,8 +18,8 @@ export default function login(req, res) {
             "client_secret": "X0IwpZHnuFI8uduRkM5RV5A8F1XJwF3T"
         })
     })
-    .then(res => res.json())
-    .then((data) => {
+    .then((res: Response) => res.json())
+    .then((data: LoginAuthResponse) => {
         res.status(200).json(data)
     })
     .catch(error => {

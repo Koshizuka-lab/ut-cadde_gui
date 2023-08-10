@@ -1,44 +1,39 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Catalog, Distribution } from '../../types'
-import { fetchWithTimeout, fetchHttps } from './fetch'
+import { Catalog, Dataset, Distribution } from '../../types'
+import fetchHttps from './fetchHttps'
 
-function preprocess(json: Catalog, query: string): Array<Distribution> {
-  let ret_data: Array<Distribution> = []
+function catalogToDatasets(json: Catalog): Array<Dataset> {
+  let retData: Array<Dataset> = []
   let results = json["result"]["results"]
-  for (let i = 0; i < results.length; i++) {
-    for (let j = 0; j < results[i]["resources"].length; j++) {
-      let tmp: Distribution = {
-        title: '',
-        provider_name: '',
-        resource_name: '',
-        data_type: '',
-        updated_time: '',
-        description: '',
-        caddec_provider_id: '',
-        caddec_dataset_id_for_detail: '',
-        url: ''
+  for (let result of results) {
+    let distibutionList: Array<Distribution> = []
+  
+    let datasetTitle = result["title"]
+    let providerName = result["organization"]["name"]
+    let caddecProviderId = result["extras"][1]["value"]
+    let caddecDatasetIdForDetail = result["extras"][0]["value"]
+
+    for (let resource of result["resources"]) {
+      let distribution: Distribution = {
+        title: datasetTitle,
+        providerName: providerName,
+        resourceName: resource["name"],
+        dataType: resource["format"],
+        updatedTime: (resource["last_modified"] != null) ? resource["last_modified"].slice(0, 10) : resource["created"].slice(0, 10),
+        description: resource["description"],
+        caddecProviderId: caddecProviderId,
+        caddecDatasetIdForDetail: caddecDatasetIdForDetail,
+        url: resource["url"]
       }
-      tmp["title"] = results[i]["title"]
-      tmp["provider_name"] = results[i]["organization"]["name"]
-      tmp["resource_name"] = results[i]["resources"][j]["name"]
-      tmp["data_type"] = results[i]["resources"][j]["format"]
-      if (results[i]["resources"][j]["last_modified"] != null) {
-        tmp["updated_time"] = results[i]["resources"][j]["last_modified"].slice(0, 10)
-      } else {
-        tmp["updated_time"] = results[i]["resources"][j]["created"].slice(0, 10)
-      }
-      tmp["description"] = results[i]["resources"][j]["description"]
-      console.log(results[i]["extras"])
-      tmp["caddec_provider_id"] = results[i]["extras"][1]["value"]
-      tmp["caddec_dataset_id_for_detail"] = results[i]["extras"][0]["value"]
-      tmp["url"] = results[i]["resources"][j]["url"]
-      if (tmp["title"].indexOf(query) >= 0) {
-        ret_data.push(tmp)
-      }
+      distibutionList.push(distribution)
     }
-    
+    let dataset: Dataset = {
+      title: datasetTitle,
+      distributions: distibutionList
+    }
+    retData.push(dataset)
   }
-  return ret_data
+  return retData
 }
 
 export default function metacatalog(req: NextApiRequest, res: NextApiResponse) {
@@ -51,21 +46,12 @@ export default function metacatalog(req: NextApiRequest, res: NextApiResponse) {
         'x-cadde-search': 'meta'
     }
   })
-  .then(res  => res.json())
-  .then(data => {
-    console.log(data)
-    const _data: Catalog = data as Catalog
-    res.status(200).json(preprocess(_data, query))
+  .then((res: Response)  => res.json())
+  .then((data: Catalog) => {
+    res.status(200).json(catalogToDatasets(data))
   })
   .catch(error => {
     console.log(error)
-
-    // データの取得に失敗したらデモデータを返す
-    fetch("https://demo.ckan.org/api/3/action/package_search")
-    .then(res => res.json())
-    .then(data =>{
-      console.log(data)
-      res.status(200).json(preprocess(data, query))
-    })
+    res.status(400).json({"error": "metacatalog failed"})
   })
 }

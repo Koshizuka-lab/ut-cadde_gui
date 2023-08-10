@@ -1,29 +1,24 @@
 import { useState } from "react";
 import { useContext } from "react";
-import { AuthToken } from "../pages/_app";
+import { LoginUser } from "../pages/_app";
 import {
-  Flex,
-  Heading,
   Input,
   Button,
   InputGroup,
   Stack,
-  InputLeftElement,
-  chakra,
   Box,
-  Link,
-  Avatar,
   FormControl,
-  FormHelperText,
   InputRightElement
 } from "@chakra-ui/react";
+import { LoginAuthResponse, User, UserContext } from "../types";
 
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [userID, setUserID] = useState("")
   const [password, setPassword] = useState("")
-  const { token, setToken } = useContext(AuthToken)
+  const [error, setError] = useState(false)
+  const { user, setUser }: UserContext = useContext(LoginUser)
 
   const handleShowClick = () => setShowPassword(!showPassword)
   const handleUserIDChange = (e) => setUserID(e.target.value)
@@ -42,30 +37,45 @@ function Login() {
         "password": password
       })
     })
-    .then(res  => res.json())
-    .then(data => {
+    .then(res  => {
+      if (!res.ok) {
+        throw new Error("error")
+      } else {
+        return res.json()
+      }
+    })
+    .then((data: LoginAuthResponse) => {
         console.log(data)
-        setToken(data["access_token"])
+        setUser({"token": data["access_token"], "userID": userID} as User)
+        setError(false)
+    }).catch(error => {
+      console.log(error)
+      setError(true)
     })
   }
 
+  const LoginFailed = () => {
+    if (error) {
+      return (
+        <Box
+          mt="1rem"
+          textAlign="center"
+          fontSize="md"
+          color="red.600"
+        >
+          User ID or Password is incorrect.
+        </Box>
+      )
+    }
+  }
+
   return (
-    // <Flex
-    //   flexDirection="column"
-    //   width="100wh"
-    //   height="100vh"
-    //   backgroundColor="gray.200"
-    //   justifyContent="center"
-    //   alignItems="center"
-    // >
       <Stack
         flexDir="column"
         mb="2"
         justifyContent="center"
         alignItems="center"
       >
-        {/* <Avatar bg="teal.500" /> */}
-        {/* <Heading color="teal.400">Welcome</Heading> */}
         <Box minW={{ base: "90%", md: "468px" }}>
           <form>
             <Stack
@@ -76,10 +86,6 @@ function Login() {
             >
               <FormControl>
                 <InputGroup>
-                  {/* <InputLeftElement
-                    pointerEvents="none"
-                    children={<CFaUserAlt color="gray.300" />}
-                  /> */}
                   <Input 
                     onChange={handleUserIDChange}
                     placeholder="user ID" 
@@ -88,11 +94,6 @@ function Login() {
               </FormControl>
               <FormControl>
                 <InputGroup>
-                  {/* <InputLeftElement
-                    pointerEvents="none"
-                    color="gray.300"
-                    children={<CFaLock color="gray.300" />}
-                  /> */}
                   <Input
                     onChange={handlePasswordChange}
                     type={showPassword ? "text" : "password"}
@@ -104,31 +105,22 @@ function Login() {
                     </Button>
                   </InputRightElement>
                 </InputGroup>
-                {/* <FormHelperText textAlign="right">
-                  <Link>forgot password?</Link>
-                </FormHelperText> */}
               </FormControl>
               <Button
                 borderRadius={0}
                 type="submit"
-                variant="solid"
+                letiant="solid"
                 colorScheme="teal"
                 width="full"
                 onClick={doAction}
               >
                 Login
               </Button>
+              {LoginFailed()}
             </Stack>
           </form>
         </Box>
       </Stack>
-      /* <Box>
-        New to us?{" "}
-        <Link color="teal.500" href="#">
-          Sign Up
-        </Link>
-      </Box> */
-    // </Flex>
   )
 }
 

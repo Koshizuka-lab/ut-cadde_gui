@@ -1,13 +1,20 @@
+import { Dispatch, SetStateAction } from "react";
+
 export interface Distribution {
   title: string,
-  provider_name: string,
-  resource_name: string,
-  data_type: string,
-  updated_time: string,
+  providerName: string,
+  resourceName: string,
+  dataType: string,
+  updatedTime: string,
   description: string,
-  caddec_provider_id: string,
-  caddec_dataset_id_for_detail: string,
+  caddecProviderId: string,
+  caddecDatasetIdForDetail: string,
   url: string
+}
+
+export interface Dataset {
+  title: string,
+  distributions: Array<Distribution>
 }
   
 export interface Catalog {
@@ -26,4 +33,18 @@ export interface Catalog {
       }>
     }>
   }
+}
+
+export interface LoginAuthResponse {
+  access_token: string,
+  refresh_token: string
+}
+
+export interface User {
+  token: string,
+  userID: string
+}
+export interface UserContext {
+  user: User,
+  setUser: Dispatch<SetStateAction<User>>
 }

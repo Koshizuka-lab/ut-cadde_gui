@@ -50,7 +50,6 @@ export const SimpleSidebar = () => {
 interface SidebarProps extends BoxProps {
   onClose: () => void;
 }
-
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   return (
     <Box

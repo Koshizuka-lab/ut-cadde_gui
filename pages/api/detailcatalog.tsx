@@ -1,4 +1,5 @@
-import { fetchWithTimeout, fetchHttps } from "./fetch"
+import { Catalog } from "../../types"
+import fetchHttps from "./fetchHttps"
 import { NextApiRequest, NextApiResponse } from "next"
 
 
@@ -18,10 +19,14 @@ export default function detailcatalog(req: NextApiRequest, res: NextApiResponse)
         "Authorization": "Bearer " + token
     }
   })
-  .then(res  => {
-    return res.json()
+  .then((res: Response)  => {
+    if (!res.ok) {
+      throw new Error("error")
+    } else {
+      return res.json()
+    }
   })
-  .then(data => {
+  .then((data: Catalog) => {
     console.log(data)
     res.status(200).json(data)
   })

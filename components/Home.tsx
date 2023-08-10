@@ -2,12 +2,13 @@ import { Stack, Box } from "@chakra-ui/react";
 import Login from "../components/Login";
 import MetaSearch from "./MetaSearch";
 import { useContext } from "react";
-import { AuthToken } from "../pages/_app";
+import { LoginUser } from "../pages/_app";
+import { UserContext } from "../types";
 
 export default function Home() {
-    const { token, setToken } = useContext(AuthToken)
+    const { user, setUser }: UserContext = useContext(LoginUser)
 
-    const box = (token ? <MetaSearch /> : <Login />)
+    const box = (user.token ? <MetaSearch /> : <Login />)
 
     return (
         <div>
