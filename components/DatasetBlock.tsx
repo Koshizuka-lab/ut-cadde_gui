@@ -82,7 +82,7 @@ function createRowItem(data: Distribution) {
     return (
         <Tr>
             <Td>{data.resourceName}</Td>
-            <Td>{data.providerName}</Td>
+            <Td>{data.caddecProviderId}</Td>
             <Td>{data.dataType}</Td>
             <Td>{data.updatedTime}</Td>
             <Td>{adjustDescriptionLength(data.description)}</Td>
