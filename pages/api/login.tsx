@@ -6,16 +6,19 @@ export default function login(req: NextApiRequest, res: NextApiResponse) {
     const userID = req.body.userID
     const password = req.body.password
 
+    const client_id = "consumer1_webapp"
+    const client_secret = "X0IwpZHnuFI8uduRkM5RV5A8F1XJwF3T"
+    const basic = btoa(`${client_id}:${client_secret}`)
+
     fetchHttps("https://172.26.16.20:18443/cadde/api/v4/token", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Basic ${basic}`,
         },
         body: JSON.stringify({
             "user_id": userID, 
             "password": password, 
-            "client_id": "consumer1_webapp", 
-            "client_secret": "X0IwpZHnuFI8uduRkM5RV5A8F1XJwF3T"
         })
     })
     .then((res: Response) => res.json())
