@@ -26,7 +26,7 @@ interface LinkItemProps {
 }
 const LinkItems: Array<LinkItemProps> = [
   { name: "Home", link: "/" },
-  // { name: "データ検索", link: "/search" },
+  { name: "Add Catalog", link: "/addCatalog" },
   // { name: "データ取得", link: "/get_immediate" },
   // { name: "定期データ取得", link: "/get_periodical" },
 ];

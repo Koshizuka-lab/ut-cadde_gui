@@ -48,3 +48,24 @@ export interface UserContext {
   user: User,
   setUser: Dispatch<SetStateAction<User>>
 }
+
+export interface Package {
+  name?: string
+  title: string
+  notes: string
+  owner_org: string,
+  caddec_provider_id: string,
+  caddec_dataset_id_for_detail?: string,
+  extras?: Array<{
+    key: string,
+    value: string
+  }>
+}
+
+export interface Resource {
+  package_id: string
+  name: string
+  description: string
+  format: string
+  url: string
+}
