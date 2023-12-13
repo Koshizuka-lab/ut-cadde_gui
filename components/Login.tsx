@@ -108,8 +108,7 @@ function Login() {
               </FormControl>
               <Button
                 borderRadius={0}
-                type="submit"
-                letiant="solid"
+                type="submit"                
                 colorScheme="teal"
                 width="full"
                 onClick={doAction}

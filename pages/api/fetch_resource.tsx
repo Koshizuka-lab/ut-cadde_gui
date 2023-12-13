@@ -19,14 +19,14 @@ export default function fetchResource(req: NextApiRequest, res: NextApiResponse)
         'Authorization':'Bearer ' + token
     }
   })
-  .then((res: Response)  => {
+  .then((res)  => {
     if (!res.ok) {
       throw new Error("error")
     } else {
       return res.text()
     }
   })
-  .then((data: Blob) => {
+  .then((data) => {
     console.log(data)
     res.status(200).send(data)
   })

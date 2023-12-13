@@ -55,7 +55,6 @@ function MetaSearch() {
                 <Spacer />
                 <Button
                     type="submit"
-                    letiant="solid"
                     colorScheme="teal"
                     width="sm"
                     onClick={doAction}

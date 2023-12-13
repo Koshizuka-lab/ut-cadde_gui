@@ -46,7 +46,7 @@ export default function metacatalog(req: NextApiRequest, res: NextApiResponse) {
         'x-cadde-search': 'meta'
     }
   })
-  .then((res: Response)  => res.json())
+  .then((res)  => res.json())
   .then((data: Catalog) => {
     res.status(200).json(catalogToDatasets(data))
   })

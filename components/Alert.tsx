@@ -18,8 +18,7 @@ function Alert(alertMessage: AlertMessage, onClose: () => void){
     return (
         <AlertDialog
             isOpen={alertMessage.header != "" && alertMessage.body != ""}
-            onClose={onClose}
-            >   
+            onClose={onClose} leastDestructiveRef={undefined}         >   
             <AlertDialogOverlay>
                 <AlertDialogContent>
                     <AlertDialogHeader>

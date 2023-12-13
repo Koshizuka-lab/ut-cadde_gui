@@ -60,7 +60,7 @@ function DatasetBlock(props: DatasetBlockProps) {
 
 function createTable(distributions: Array<Distribution>) {
     return (
-        <Table letiant="striped" size="md">
+        <Table size="md">
             <Thead>
                 <Tr>
                 <Th>DisTribution Title</Th>

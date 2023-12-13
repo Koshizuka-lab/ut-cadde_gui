@@ -15,7 +15,7 @@ export default function ckan(req: NextApiRequest, res: NextApiResponse) {
         },
         body: JSON.stringify(body)
     })
-    .then((res: Response) => res.json())
+    .then((res) => res.json())
     .then((data: any) => {
         res.status(200).json(data)
     })

@@ -21,7 +21,7 @@ export default function login(req: NextApiRequest, res: NextApiResponse) {
             "password": password, 
         })
     })
-    .then((res: Response) => res.json())
+    .then((res) => res.json())
     .then((data: LoginAuthResponse) => {
         res.status(200).json(data)
     })

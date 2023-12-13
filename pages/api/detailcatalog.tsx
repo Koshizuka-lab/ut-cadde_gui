@@ -19,7 +19,7 @@ export default function detailcatalog(req: NextApiRequest, res: NextApiResponse)
         "Authorization": "Bearer " + token
     }
   })
-  .then((res: Response)  => {
+  .then((res)  => {
     if (!res.ok) {
       throw new Error("error")
     } else {

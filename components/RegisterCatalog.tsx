@@ -30,8 +30,8 @@ export default function RegisterCatalog() {
                 "value": dataset.caddec_provider_id
             },
             {
-            "key": "caddec_dataset_id_for_detail",
-            "value": dataset.title
+                "key": "caddec_dataset_id_for_detail",
+                "value": dataset.title
             },        
         ]
     }
@@ -105,7 +105,7 @@ export default function RegisterCatalog() {
   return (
     <Container maxW="container.lg">
         <Heading>Register Catalog</Heading>
-        <Text fontWeight="bold" fontSize="2xl" mt="5">Create Dataset</Text>
+        <Text fontWeight="bold" fontSize="2xl" mt="5">1. Create Dataset</Text>
         <Input type="text" onChange={(e) => setDataset({...dataset, title: e.target.value})} placeholder="title" />
         <Input type="text" onChange={(e) => setDataset({...dataset, notes: e.target.value})} placeholder="notes" />
         <Input type="text" onChange={(e) => setDataset({...dataset, owner_org: e.target.value})} placeholder="owner_org" />
@@ -115,7 +115,7 @@ export default function RegisterCatalog() {
           <Text fontSize="xl" m="3">dataset ID：{datasetId}</Text>
         </Flex>
 
-        <Text fontWeight="bold" fontSize="2xl" mt="5">Add Resource</Text>
+        <Text fontWeight="bold" fontSize="2xl" mt="5">2-a. Add Resource</Text>
         <Input type="text" onChange={(e) => setResource({...resource, name: e.target.value})} placeholder="name" />
         <Input type="text" onChange={(e) => setResource({...resource, description: e.target.value})} placeholder="description" />
         <Input type="text" onChange={(e) => setResource({...resource, format: e.target.value})} placeholder="format" />
@@ -123,7 +123,7 @@ export default function RegisterCatalog() {
         <Input type="text" onChange={(e) => setDatasetId(e.target.value)} placeholder="dataset ID" defaultValue={datasetId} />
         <Button onClick={addResource} mt="2">add resource</Button>
 
-        <Text fontWeight="bold" fontSize="2xl" mt="5">Add Multipul Resources</Text>
+        <Text fontWeight="bold" fontSize="2xl" mt="5">2-b. Add Multipul Resources</Text>
         <Input type="text" onChange={(e) => setParentDir(e.target.value)} placeholder="parent directory" />
         <Input type="text" onChange={(e) => setFiles(e.target.value.split(","))} placeholder="file names (splited by ,)" />
         <Input type="text" onChange={(e) => setDatasetId(e.target.value)} placeholder="dataset ID" defaultValue={datasetId} />

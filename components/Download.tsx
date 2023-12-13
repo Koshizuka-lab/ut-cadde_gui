@@ -102,7 +102,6 @@ function Download(props: DownloadProps) {
             <Button 
                 onClick={doAction}
                 colorScheme="teal"
-                letiant="outline"
                 size="sm"
                 >
                 Download
