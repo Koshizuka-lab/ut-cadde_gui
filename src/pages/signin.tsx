@@ -1,7 +1,46 @@
 import { NextPage } from "next";
-import { Header } from '@/containers/Header'
+import { Header } from "@/layouts/Header"
+import { useState } from "react";
+import { useRouter } from "next/router";
+import Cookies from "js-cookie";
+import { InputForm } from "@/components/InputForm";
+
 
 const Page: NextPage = () => {
+  const [userID, setUserID] = useState("")
+  const [password, setPassword] = useState("")
+  const router = useRouter()
+
+  const login = async () => {
+    fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "userID": userID,
+        "password": password
+      })
+    })
+    .then(res  => {
+      console.log(res)
+      if (!res.ok) {
+        throw new Error("error")
+      }
+      return res.json()
+    })
+    .then((data) => {
+      console.log(data)
+      Cookies.set("access_token", data.access_token, { expires: 1, path: "/" });
+      Cookies.set("refresh_token", data.refresh_token, { expires: 1, path: "/" });
+      Cookies.set("user_id", userID, { expires: 1, path: "/" });
+      router.push("/settings")
+    })
+    .catch(error => {
+      console.log(error)
+    })
+  }
+
   return <>
     <Header />
     <div className="flex justify-center items-center w-full h-screen bg-form">
@@ -10,32 +49,18 @@ const Page: NextPage = () => {
           <div className="text-3xl text-primary font-bold font-inter">
             Sign In
           </div>
-          <div className="flex flex-col justify-left w-72 pt-5">
-            <div className="text-md font-inter">DATA-EX ID</div>
-            <input
-              className="bg-form border-b border-secondary w-full h-10"
-              type="text"
-            />
-          </div>
-          <div className="flex flex-col justify-left w-72 pt-5">
-            <div className="text-md font-inter">Password</div>
-            <input 
-              className="bg-form border-b border-secondary w-full h-10"
-              type="password"
-            />
-            <div className="flex flex-row justify-end">
-              <div className="text-primary font-inter text-sm pt-2 underline">
-                Forgot password?
-              </div>
-            </div>
-          </div>
+          <InputForm label="DATA-EX ID" value={userID} setValue={setUserID} />
+          <InputForm label="Password" value={password} setValue={setPassword} type="password" />
           <div className="flex justify-center items-center py-10">
-            <button className="bg-primary text-white w-48 h-10 font-inter font-bold">
+            <button
+              className="bg-primary text-white w-48 h-10 font-inter font-bold"
+              onClick={login}
+            >
               Sign In
             </button>
           </div>
           <div className="text-primary font-inter text-sm">
-            Don't have DATA-EX ID? <a className="text-primary underline">Create one</a>
+            Don&apos;t have DATA-EX ID? <a className="text-primary underline">Create one</a>
           </div>
         </div>
       </div>
