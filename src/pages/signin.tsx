@@ -49,8 +49,12 @@ const Page: NextPage = () => {
           <div className="text-3xl text-primary font-bold font-inter">
             Sign In
           </div>
-          <InputForm label="DATA-EX ID" value={userID} setValue={setUserID} />
-          <InputForm label="Password" value={password} setValue={setPassword} type="password" />
+          <div className="pt-5">
+            <InputForm label="DATA-EX ID" value={userID} setValue={setUserID} />
+          </div>
+          <div className="pt-5">
+            <InputForm label="Password" value={password} setValue={setPassword} type="password" />
+          </div>
           <div className="flex justify-center items-center py-10">
             <button
               className="bg-primary text-white w-48 h-10 font-inter font-bold"

@@ -18,7 +18,8 @@ const config: Config = {
         primary: '#00479D',
         secondary: '#C9D0DC',
         gray: '#E0E0E0',
-        form: '#F3F3F7'
+        form: '#F3F3F7',
+        alert: '#FF0000',
       },
       fontFamily: {
         inter: ['Inter', 'sans-serif'],

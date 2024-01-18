@@ -1,0 +1,81 @@
+export interface Catalog {
+  success: boolean,
+  count: number,
+  results: Dataset[],
+  facets: any,
+  search_facets: any,
+}
+
+export interface Dataset {
+  author: string,
+  author_email: string,
+  creator_user_id: string,
+  extras: Extra[],
+  groups: any[],
+  id: string,
+  isopen: boolean,
+  license_id: string,
+  license_title: string,
+  maintainer: string,
+  maintainer_email: string,
+  metadata_created: string,
+  metadata_modified: string,
+  name: string,
+  notes: string,
+  num_resources: number,
+  num_tags: number,
+  organization: Organization,
+  owner_org: string,
+  private: boolean,
+  relationships_as_object: any[],
+  relationships_as_subject: any[],
+  resources: Resource[],
+  state: string,
+  tags: any[],
+  title: string,
+  type: string,
+  url: string,
+  version: string,
+}
+
+export interface Resource {
+  cache_last_updated: string,
+  cache_url: string,
+  created: string,
+  datastore_active: boolean,
+  description: string,
+  format: string,
+  hash: string,
+  id: string,
+  last_modified: string,
+  metadata_modified: string,
+  mimetype: string,
+  mimetype_inner: string,
+  name: string,
+  package_id: string,
+  position: number,
+  resource_type: string,
+  size: number,
+  state: string,
+  url: string,
+  url_type: string,
+}
+
+
+export interface Extra {
+  key: "caddec_dataset_id_for_detail" | "caddec_provider_id",
+  value: string,
+}
+
+export interface Organization {
+  approval_status: string,
+  created: string,
+  description: string,
+  id: string,
+  image_url: string,
+  is_organization: boolean,
+  name: string,
+  state: string,
+  title: string,
+  type: string,
+}

@@ -1,3 +1,5 @@
+import { Catalog } from "./ckan"
+
 export interface Options { 
   method: string
   headers: { // login
@@ -24,8 +26,13 @@ export interface Options {
   agent?: any 
 }
 
-
 export interface LoginAuthResponse {
-    access_token: string,
-    refresh_token: string
-  }
+  access_token: string,
+  refresh_token: string
+}
+
+export interface SearchResponse {
+  help: string;
+  success: boolean;
+  result: Catalog;
+}
