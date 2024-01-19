@@ -10,6 +10,9 @@ const Page: NextPage = () => {
   const [userID, setUserID] = useState("")
   const [password, setPassword] = useState("")
   const router = useRouter()
+  Cookies.remove("access_token");
+  Cookies.remove("refresh_token");
+  Cookies.remove("user_id");
 
   const login = async () => {
     fetch("/api/login", {

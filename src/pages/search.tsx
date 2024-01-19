@@ -4,12 +4,13 @@ import { Layout } from "@/layouts/Layout";
 import { Dataset } from "@/types/ckan";
 import { SearchResponse } from "@/types/api";
 import { NextPage } from "next";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { formatDate } from "@/hooks/formatDate";
 import { joinFormats, extractFormats } from "@/hooks/format";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import { findDatasetID } from "@/hooks/findDatasetID";
+import { FetchOptions, useFetch } from "@/hooks/useFetch";
 
 interface SearchBoxProps {
   query: string;
@@ -50,44 +51,44 @@ const Page: NextPage = () => {
   const [searchType, setSearchType] = useState<string>("meta"); // meta or detail
   const [providerID, setProviderID] = useState<string>("");
   const [providerURL, setProviderURL] = useState<string>("");
-  const [datasets, setDatasets] = useState<Dataset[]>([]);
-  const [count, setCount] = useState<number>(0);
 
-  const search = () => {
-    let url;
+  const url = useMemo(() => {
     if (dataspace === "dataex") {
       if (searchType === "meta") {
-        url = `/api/dataex/search/meta?q=${query}`
+        return `/api/dataex/search/meta?q=${query}`
       } else {
-        url = `/api/dataex/search/detail?q=${query}`
+        return `/api/dataex/search/detail?q=${query}`
       }
     } else {
-      url = `/api/ids-dsc/search?q=${query}&providerURL=${providerURL}`
+      return `/api/ids-dsc/search?q=${query}&providerURL=${providerURL}`
     }
-    const headers = {}
+  }, [dataspace, searchType, query, providerURL]);
+  const options: FetchOptions = useMemo(() => {
     if (searchType === "detail") {
-      headers["Authorization"] = `Bearer ${Cookies.get("access_token")}`
-    }
-    if (providerID !== "") {
-      headers["x-cadde-provider"] = providerID
-    }
-    fetch(url, {
-      method: "GET",
-      headers: headers
-    })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error("error")
+      return {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${Cookies.get("access_token")}`,
+          "x-cadde-provider": providerID,
+        }
       }
-      return res.json()
-    })
-    .then((data: SearchResponse) => {
-      console.log(data);
-      const catalog = data.result;
-      setCount(catalog.count);
-      setDatasets(catalog.results);
-    })
-  }
+    } else {
+      return {
+        method: "GET",
+        headers: {}
+      }
+    }
+  }, [searchType, providerID]);
+
+  const { data, error, loading, fetchData } = useFetch<SearchResponse>(url, options);
+
+  const count = useMemo(() => {
+    return data?.result.count || 0;
+  }, [data]);
+
+  const datasets = useMemo(() => {
+    return data?.result.results || [];
+  }, [data]);
 
   return <>
     <Layout>
@@ -99,7 +100,7 @@ const Page: NextPage = () => {
           <SearchBox
             query={query}
             setQuery={setQuery}
-            onClick={search}
+            onClick={fetchData}
           />
         </div>
         <div className="flex flex-col items-start p-5">
@@ -164,9 +165,9 @@ const Page: NextPage = () => {
               className="flex flex-col items-start border border-secondary p-5 hover:border-primary hover:bg-primary hover:bg-opacity-10 cursor-pointer group"
               onClick={() => {
                 if (searchType === "meta") {
-                  router.push(`/download/${findDatasetID(dataset)}/meta`)
+                  router.push(`/dataset/${findDatasetID(dataset)}/meta`)
                 } else {
-                  router.push(`/download/${findDatasetID(dataset)}/detail?providerID=${providerID}`)
+                  router.push(`/dataset/${findDatasetID(dataset)}/detail?providerID=${providerID}`)
                 }
               }}
             >

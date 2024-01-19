@@ -8,6 +8,7 @@ const fetchHttps = (url: string, options: Options) => {
   for (const [key, value] of Object.entries(options["headers"])) {
       console.log("key: " + key + ", value: " + value)
   }
+  console.log("-----------------")
   const https = require("https")
   const fs = require("fs")
 

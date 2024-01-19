@@ -1,46 +1,66 @@
 import { Layout } from '@/layouts/Layout';
 import { SearchResponse } from '@/types/api';
-import { Dataset } from '@/types/ckan';
+import { Dataset, Resource } from '@/types/ckan';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Cookies from "js-cookie";
-import { DatasetView } from './meta';
+import { DatasetView } from '@/components/DatasetView';
 import { Section } from '@/components/Section';
 import { formatDate } from '@/hooks/formatDate';
+import { FetchOptions, fetchWithRefresh, useFetch } from '@/hooks/useFetch';
+import { downloadFile } from '@/hooks/downloadFile';
 
 const Page: NextPage = () => {
   const router = useRouter();
-  const [dataset, setDataset] = useState<Dataset>();
-
-  useEffect(() => {
-    if (router.isReady) {
-      const { datasetID, providerID } = router.query as { datasetID: string, providerID: string };
-      const url = `/api/dataex/search/detail?fq=caddec_dataset_id_for_detail:${datasetID}`;
-      const headers = {
+  const { datasetID, providerID } = router.query as { datasetID: string, providerID: string };
+  const url = datasetID ? `/api/dataex/search/detail?fq=caddec_dataset_id_for_detail:${datasetID}` : "";
+  const options = useMemo<FetchOptions>(() => {
+    return {
+      method: "GET",
+      headers: {
         "Authorization": `Bearer ${Cookies.get("access_token")}`,
         "x-cadde-provider": providerID,
       }
-      fetch(url, {
-        method: "GET",
-        headers: headers,
-      })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error("error")
-        }
-        return res.json()
-      })
-      .then((data: SearchResponse) => {
-        console.log(data);
-        if (data.result.count !== 1) {
-          throw new Error("error")
-        }
-        setDataset(data.result.results[0]);
-      })
     }
+  }, [providerID]);
+  const { data, error, loading, fetchData } = useFetch<SearchResponse>(url, options);
+  const dataset = useMemo<Dataset | null>(() => {
+    return data?.result.results[0] || null;
+  }, [data]);
+
+  useEffect(() => {
+    if (url) {
+      fetchData();
+    }
+  }, [url]);
+
+  const fetchFile = async (resource: Resource) => {
+    const requestUrl = "/api/dataex/download";
+    const requestOptions: FetchOptions = {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${Cookies.get("access_token")}`,
+        "x-cadde-provider": providerID,
+        "x-cadde-resource-url": resource.url,
+        "x-cadde-resource-api-type": "file/http",
+      }
+    }
+    fetchWithRefresh(requestUrl, requestOptions)
+      .then((res) => {
+        if (!res.ok) {
+          throw res;
+        } else {
+          return res.blob()
+        }
+      })
+      .then((blob: Blob) => {
+        downloadFile(blob, resource.name)
+      })
+      .catch(error => {
+        alert(error.message);
+      })
   }
-  , [router]);
 
   return <>
     <Layout>
@@ -75,6 +95,7 @@ const Page: NextPage = () => {
                   <div className="font-inter text-lg">file/http</div>
                   <button
                     className="bg-primary text-white w-36 h-10 font-inter font-bold"
+                    onClick={() => fetchFile(resource)}
                   >
                     Download
                   </button>

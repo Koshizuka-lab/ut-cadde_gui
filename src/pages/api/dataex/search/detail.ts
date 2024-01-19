@@ -24,7 +24,12 @@ export default function detail(req: NextApiRequest, res: NextApiResponse) {
     method: 'GET',
     headers: headers,
   })
-  .then((res)  => res.json())
+  .then((res)  => {
+    if (!res.ok) {
+      throw res
+    }
+    return res.json()
+  })
   .then((data) => {
     res.status(200).json(data)
   })
