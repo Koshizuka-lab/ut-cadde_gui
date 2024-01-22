@@ -10,7 +10,8 @@ export default function login(req: NextApiRequest, res: NextApiResponse) {
     const client_secret = "X0IwpZHnuFI8uduRkM5RV5A8F1XJwF3T"
     const basic = btoa(`${client_id}:${client_secret}`)
 
-    fetchHttps("https://172.26.16.20:18443/cadde/api/v4/token", {
+    const url = process.env.AUTH_API_URL + "token"
+    fetchHttps(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

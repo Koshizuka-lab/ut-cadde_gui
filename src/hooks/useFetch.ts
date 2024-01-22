@@ -7,6 +7,7 @@ export interface FetchOptions extends RequestInit {
     'x-cadde-provider'?: string,
     'x-cadde-resource-url'?: string,
     'x-cadde-resource-api-type'?: string,
+    'consumer-connector-origin'?: string,
   }
 }
 

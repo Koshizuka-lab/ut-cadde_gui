@@ -8,19 +8,22 @@ export interface Options {
       'Content-Type': string 
       'Cache-Control': string 
       'x-cadde-search': string 
+      'consumer-connector-url': string
   } | { // fetch deteilcatalog
       'Content-Type': string 
       'Cache-Control': string 
       'x-cadde-search': string 
       "x-cadde-provider": string 
       "Authorization": string 
+      'consumer-connector-url': string
   } | { // fetch resource
       'Content-Type': string 
       'Cache-Control': string 
       'x-cadde-resource-url': string 
       'x-cadde-resource-api-type': string 
       'x-cadde-provider': string 
-      "Authorization": string 
+      "Authorization": string
+      'consumer-connector-url': string
   }
   body?: string
   agent?: any 

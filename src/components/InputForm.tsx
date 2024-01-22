@@ -3,18 +3,20 @@ interface InputFormProps {
   value: string;
   setValue: (value: string) => void;
   type?: string;
+  required?: boolean;
 }
 
 export const InputForm = (props: InputFormProps) => {
-  const { label, value, setValue, type } = props;
+  const { label, value, setValue, type, required } = props;
   return (
-    <div className="flex flex-col justify-left w-72">
+    <div className="flex flex-col justify-left w-64">
       <div className="text-md font-inter">{label}</div>
       <input
         className="bg-form border-b border-secondary w-full h-10 pl-2"
-        type={type ? type : "text"}
         onChange={e => setValue(e.target.value)}
         value={value}
+        type={type || "text"}
+        required={required}
       />
     </div>
   );

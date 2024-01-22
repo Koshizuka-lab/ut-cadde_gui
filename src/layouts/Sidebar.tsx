@@ -16,7 +16,7 @@ const SideBox = (props: { icon: string, text: string, onClick: () => void }) => 
 export const Sidebar = () => {
   const router = useRouter();
 
-  return <div className="bg-white h-full w-56 flex flex-col justify-start items-center border-r border-gray">
+  return <div className="fixed top-0 left-0 bg-white h-full w-56 pt-16 z-0 flex flex-col justify-start items-center border-r border-gray">
     <SideBox
       icon="settings"
       text="Settings"

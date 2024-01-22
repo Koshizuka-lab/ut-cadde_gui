@@ -5,9 +5,9 @@ export default function meta(req: NextApiRequest, res: NextApiResponse) {
   const { q, fq } = req.query;
   let query: string;
   if (fq != null) {
-    query = "fq=" + fq;
+    query = "rows=100&fq=" + fq;
   } else if (q != null) {
-    query = "q=" + q;
+    query = "rows=100&q=" + q;
   } else {
     res.status(400).json({"error": "search failed"})
     return;
@@ -18,7 +18,8 @@ export default function meta(req: NextApiRequest, res: NextApiResponse) {
     'x-cadde-search': 'meta',
     'x-cadde-dataspace': 'dataex',
   }
-  fetchHttps('https://172.26.16.20:443/cadde/api/v4/catalog?' + query, {
+  const url = req.headers["consumer-connector-origin"] + "/cadde/api/v4/catalog?" + query
+  fetchHttps(url, {
     method: 'GET',
     headers: headers,
   })

@@ -33,7 +33,7 @@ export const DatasetView = ({ dataset }: { dataset: Dataset }) => {
         <Section label="Metadata" />
       </div>
       <div className="flex flex-col jutify-center items-center p-16">
-        <div className="grid grid-cols-3 gap-x-5 w-2/3">
+        <div className="grid grid-cols-3 gap-x-5 w-2/3 items-center">
           <Row label="provider" value={dataset.organization.title} />
           <Row label="maintainer" value={dataset.maintainer} />
           <Row label="published" value={formatDate(new Date(dataset.metadata_created), false)} />

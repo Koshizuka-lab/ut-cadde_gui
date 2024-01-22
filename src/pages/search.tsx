@@ -1,5 +1,5 @@
 import { InputForm } from "@/components/InputForm";
-import { Radio } from "@/components/Radio";
+import { Radio, RadioThin } from "@/components/Radio";
 import { Layout } from "@/layouts/Layout";
 import { Dataset } from "@/types/ckan";
 import { SearchResponse } from "@/types/api";
@@ -11,6 +11,8 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import { findDatasetID } from "@/hooks/findDatasetID";
 import { FetchOptions, useFetch } from "@/hooks/useFetch";
+import { useAppSelector } from "@/hooks/useStore";
+import { PageNumberSelector } from "@/components/PageNumberSelector";
 
 interface SearchBoxProps {
   query: string;
@@ -51,6 +53,9 @@ const Page: NextPage = () => {
   const [searchType, setSearchType] = useState<string>("meta"); // meta or detail
   const [providerID, setProviderID] = useState<string>("");
   const [providerURL, setProviderURL] = useState<string>("");
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [displayCount, setDisplayCount] = useState<number>(10);
+  const consumerConnectorOrigin = useAppSelector(state => state.consumerConnector.origin);
 
   const url = useMemo(() => {
     if (dataspace === "dataex") {
@@ -70,29 +75,32 @@ const Page: NextPage = () => {
         headers: {
           "Authorization": `Bearer ${Cookies.get("access_token")}`,
           "x-cadde-provider": providerID,
+          "consumer-connector-origin": consumerConnectorOrigin,
         }
       }
     } else {
       return {
         method: "GET",
-        headers: {}
+        headers: {
+          "consumer-connector-origin": consumerConnectorOrigin,
+        }
       }
     }
-  }, [searchType, providerID]);
+  }, [searchType, providerID, consumerConnectorOrigin]);
 
   const { data, error, loading, fetchData } = useFetch<SearchResponse>(url, options);
 
   const count = useMemo(() => {
-    return data?.result.count || 0;
+    return data?.result.results.length || 0;
   }, [data]);
 
   const datasets = useMemo(() => {
-    return data?.result.results || [];
-  }, [data]);
+    return data?.result.results.slice((pageNumber - 1) * displayCount, pageNumber * displayCount) || [];
+  }, [data, pageNumber, displayCount]);
 
   return <>
     <Layout>
-      <div className="bg-white flex flex-col w-full px-20">
+      <div className="bg-white flex flex-col w-full px-20 py-10">
         <div className="flex flex-col items-center">
           <div className="text-4xl text-primary font-bold font-inter pt-10">
             Search for dataset in the Dataspace
@@ -113,7 +121,7 @@ const Page: NextPage = () => {
           {dataspace === "dataex" && (
             <>
               <div className="pl-10">
-                <Radio
+                <RadioThin
                   id="meta"
                   label="Meta Search"
                   checked={searchType === "meta"}
@@ -121,7 +129,7 @@ const Page: NextPage = () => {
                 />
               </div>
               <div className="pl-10">
-                <Radio
+                <RadioThin
                   id="detail"
                   label="Detail Search"
                   checked={searchType === "detail"}
@@ -155,57 +163,74 @@ const Page: NextPage = () => {
             </div>
           )}
         </div>
-        <div className="font-bold font-inter text-2xl pt-10">
-          {count} datasets found
-        </div>
-        <div className="flex flex-col gap-5 py-10">
-          {datasets.map((dataset: Dataset, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-start border border-secondary p-5 hover:border-primary hover:bg-primary hover:bg-opacity-10 cursor-pointer group"
-              onClick={() => {
-                if (searchType === "meta") {
-                  router.push(`/dataset/${findDatasetID(dataset)}/meta`)
-                } else {
-                  router.push(`/dataset/${findDatasetID(dataset)}/detail?providerID=${providerID}`)
-                }
-              }}
-            >
-              <div className="text-primary font-bold font-inter text-2xl group-hover:border-b group-hover:border-primary">
-                {dataset.title}
-              </div>
-              <div className="font-inter text-xl">
-                {dataset.organization.title}
-              </div>
-              <div className="font-inter text-md py-5">
-                {dataset.notes}
-              </div>
-              <div className="grid grid-cols-2 gap-x-5">
-                <div className="font-inter text-md">
-                  published
-                </div>
-                <div className="font-inter text-md">
-                  {formatDate(new Date(dataset.metadata_created), true)}
-                </div>
-                <div className="col-span-2 border-b border-secondary" />
-                <div className="font-inter text-md">
-                  last updated
-                </div>
-                <div className="font-inter text-md">
-                  {formatDate(new Date(dataset.metadata_modified), true)}
-                </div>
-                <div className="col-span-2 border-b border-secondary" />
-                <div className="font-inter text-md">
-                  format
-                </div>
-                <div className="font-inter text-md">
-                  {joinFormats(extractFormats(dataset))}
-                </div>
-                <div className="col-span-2 border-b border-secondary" />
-              </div>
+        {loading ? (
+          <div className="flex justify-center items-center w-full h-32">
+            <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-r-4 border-primary" />
+          </div>
+        ) : (
+          <>
+            <div className="font-bold font-inter text-2xl pt-10">
+              {count} datasets found
             </div>
-          ))}
-        </div>
+            <div className="flex flex-col items-center pt-5">
+              <PageNumberSelector
+                pageNumber={pageNumber}
+                setPageNumber={setPageNumber}
+                displayCount={displayCount}
+                setDisplayCount={setDisplayCount}
+                dataCount={data?.result.results.length || 0}
+              />
+            </div>
+            <div className="flex flex-col gap-5 pb-10 pt-5">
+              {datasets.map((dataset: Dataset, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col items-start border border-secondary p-5 hover:border-primary hover:bg-primary hover:bg-opacity-10 cursor-pointer group"
+                  onClick={() => {
+                    if (searchType === "meta") {
+                      router.push(`/dataset/${findDatasetID(dataset)}?searchType=meta`)
+                    } else {
+                      router.push(`/dataset/${findDatasetID(dataset)}?searchType=meta&providerID=${providerID}`)
+                    }
+                  }}
+                >
+                  <div className="text-primary font-bold font-inter text-2xl group-hover:border-b group-hover:border-primary">
+                    {dataset.title}
+                  </div>
+                  <div className="font-inter text-xl">
+                    {dataset.organization.title}
+                  </div>
+                  <div className="font-inter text-md py-5">
+                    {dataset.notes}
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-5">
+                    <div className="font-inter text-md">
+                      published
+                    </div>
+                    <div className="font-inter text-md">
+                      {formatDate(new Date(dataset.metadata_created), true)}
+                    </div>
+                    <div className="col-span-2 border-b border-secondary" />
+                    <div className="font-inter text-md">
+                      last updated
+                    </div>
+                    <div className="font-inter text-md">
+                      {formatDate(new Date(dataset.metadata_modified), true)}
+                    </div>
+                    <div className="col-span-2 border-b border-secondary" />
+                    <div className="font-inter text-md">
+                      format
+                    </div>
+                    <div className="font-inter text-md">
+                      {joinFormats(extractFormats(dataset))}
+                    </div>
+                    <div className="col-span-2 border-b border-secondary" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </Layout>
   </>
