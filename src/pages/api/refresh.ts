@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import fetchHttps from "./fetchHttps"
-import { LoginAuthResponse } from "@/types/api"
 
 export default function refresh(req: NextApiRequest, res: NextApiResponse) {
     const refresh_token = req.body.refresh_token
@@ -21,7 +20,7 @@ export default function refresh(req: NextApiRequest, res: NextApiResponse) {
         })
     })
     .then((res) => res.json())
-    .then((data: LoginAuthResponse) => {
+    .then((data) => {
         console.log(data)
         res.status(200).json(data)
     })

@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import fetchHttps from "./fetchHttps"
-import { LoginAuthResponse } from "@/types/api"
 
 export default function login(req: NextApiRequest, res: NextApiResponse) {
     const userID = req.body.userID
@@ -23,7 +22,7 @@ export default function login(req: NextApiRequest, res: NextApiResponse) {
         })
     })
     .then((res) => res.json())
-    .then((data: LoginAuthResponse) => {
+    .then((data) => {
         console.log(data)
         res.status(200).json(data)
     })
