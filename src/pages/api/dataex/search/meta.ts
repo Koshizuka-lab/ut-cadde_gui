@@ -18,7 +18,7 @@ export default function meta(req: NextApiRequest, res: NextApiResponse) {
     'x-cadde-search': 'meta',
     'x-cadde-dataspace': 'dataex',
   }
-  const url = req.headers["consumer-connector-origin"] + "/cadde/api/v4/catalog?" + query
+  const url = req.headers["consumer-connector-origin"] + "cadde/api/v4/catalog?" + query
   fetchHttps(url, {
     method: 'GET',
     headers: headers,

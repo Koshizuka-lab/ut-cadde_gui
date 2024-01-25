@@ -10,7 +10,7 @@ export default function download(req: NextApiRequest, res: NextApiResponse) {
     'x-cadde-provider': req.headers["x-cadde-provider"],
     'Authorization':req.headers["authorization"],
   }
-  const url = req.headers["consumer-connector-origin"] + "/cadde/api/v4/file"
+  const url = req.headers["consumer-connector-origin"] + "cadde/api/v4/file"
   fetchHttps(url, {
       method: 'GET', 
       headers: headers,

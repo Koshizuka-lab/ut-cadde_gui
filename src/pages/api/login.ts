@@ -21,7 +21,13 @@ export default function login(req: NextApiRequest, res: NextApiResponse) {
             "password": password, 
         })
     })
-    .then((res) => res.json())
+    .then((res) => {
+        if (!res.ok) {
+            throw res
+        } else {
+            return res
+        }
+    })
     .then((data) => {
         console.log(data)
         res.status(200).json(data)

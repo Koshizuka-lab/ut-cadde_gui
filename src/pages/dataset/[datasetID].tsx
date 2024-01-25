@@ -11,6 +11,7 @@ import { downloadFile } from '@/hooks/downloadFile';
 import { useAppSelector } from '@/hooks/useStore';
 import { findProviderID } from '@/hooks/findProviderID';
 import { DatasetView } from '@/components/DatasetView';
+import { SearchResponse } from '@/types/api';
 
 const Page: NextPage = () => {
   const router = useRouter();
@@ -19,6 +20,7 @@ const Page: NextPage = () => {
   const [providerID, setProviderID] = useState<string>(router.query.providerID as string);
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [requesting, setRequesting] = useState<boolean>(false);
+  const [checkedResources, setCheckedResources] = useState<boolean[]>([]);
   const consumerConnectorOrigin = useAppSelector(state => state.consumerConnector.origin);
 
   const url = useMemo(() => {
@@ -54,7 +56,7 @@ const Page: NextPage = () => {
           }
           return res.json()
         })
-        .then((data) => {
+        .then((data: SearchResponse) => {
           setDataset(data.result.results[0]);
         })
         .catch(error => {
@@ -82,11 +84,13 @@ const Page: NextPage = () => {
       }
       return res.json()
     })
-    .then((data) => {
+    .then((data: SearchResponse) => {
       console.log(data)
-      setDataset(data.result.results[0]);
+      const dataset = data.result.results[0];
+      setDataset(dataset);
       setSearchType("detail");
       setProviderID(providerID);
+      setCheckedResources(dataset.resources.map(() => false));
     })
     .catch(error => {
       alert(error.message)
@@ -94,6 +98,15 @@ const Page: NextPage = () => {
     .finally(() => {
       setRequesting(false);
     })
+  }
+
+  const download = async () => {
+    const resources = dataset?.resources.filter((_, index) => checkedResources[index]);
+    if (resources) {
+      Promise.all(resources.map((resource) => {
+        return fetchFile(resource);
+      }))
+    }
   }
 
   const fetchFile = async (resource: Resource) => {
@@ -146,28 +159,58 @@ const Page: NextPage = () => {
                 <Section label="Resources" />
               </div>
               <div className="flex flex-col items-center py-5">
-                <div className="flex flex-col gap-y-4 w-full">
-                  {/* <div className="flex flex-row justify-between items-center px-4 py-2 mx-20">
-                    <div className="font-bold font-inter text-lg">title</div>
-                    <div className="font-bold font-inter text-lg">format</div>
-                    <div className="font-bold font-inter text-lg">last updated</div>
-                    <div className="font-bold font-inter text-lg">api type</div>
-                    <div></div>
-                  </div> */}
-                  {dataset.resources.map((resource, index) => (
-                    <div key={index} className="flex flex-row justify-between items-center border border-secondary px-4 py-2 mx-20 hover:border-primary hover:bg-primary hover:bg-opacity-10 cursor-pointer">
-                      <div className="font-inter text-xl font-bold text-primary">{resource.name}</div>
-                      <div className="font-inter text-lg">{resource.format}</div>
-                      <div className="font-inter text-lg">{formatDate(new Date(resource.last_modified), true)}</div>
-                      <div className="font-inter text-lg">file/http</div>
-                      <button
-                        className="bg-primary text-white w-36 h-10 font-inter font-bold"
-                        onClick={() => fetchFile(resource)}
-                      >
-                        Download
-                      </button>
-                    </div>
-                  ))}
+                <div>
+                  <table className="table-auto">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th className="px-4 py-2">title</th>
+                        <th className="px-4 py-2">format</th>
+                        <th className="px-4 py-2">last updated</th>
+                        <th className="px-4 py-2">api type</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dataset.resources.map((resource, index) => {
+                        const borderColor = checkedResources[index] ? "border-primary" : "border-secondary";
+                        return (
+                          <>
+                        <tr
+                          key={index}
+                          className={`border ${borderColor} hover:border-primary hover:bg-primary hover:bg-opacity-10 cursor-pointer`}
+                          onClick={() => {
+                            const newCheckedResources = checkedResources.slice();
+                            newCheckedResources[index] = !newCheckedResources[index];
+                            setCheckedResources(newCheckedResources);
+                          }}
+                        >
+                          <td className="px-4 pt-2">
+                            <input
+                              className="w-5 h-5 accent-primary"
+                              type="checkbox"
+                              checked={checkedResources[index]}
+                            />
+                          </td>
+                          <td className="px-4 py-4">{resource.name}</td>
+                          <td className="px-4 py-4">{resource.format}</td>
+                          <td className="px-4 py-4">{formatDate(new Date(resource.last_modified), true)}</td>
+                          <td className="px-4 py-4">file/http</td>
+                        </tr>
+                        <tr className="h-3">
+                          <td colSpan={5} />
+                        </tr>
+                        </>);
+                      })}
+                    </tbody>
+                  </table>
+                  <div className="flex flex-row justify-end w-full pt-5">
+                    <button
+                      className="bg-primary text-white w-36 h-10 font-inter font-bold"
+                      onClick={download}
+                    >
+                      Download
+                    </button>
+                  </div>
                 </div>
               </div>
             </>

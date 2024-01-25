@@ -41,6 +41,7 @@ const Page: NextPage = () => {
     })
     .catch(error => {
       console.log(error)
+      alert("ID or Password is invalid")
     })
   }
 
