@@ -189,7 +189,7 @@ const Page: NextPage = () => {
                     if (searchType === "meta") {
                       router.push(`/dataset/${findDatasetID(dataset)}?searchType=meta`)
                     } else {
-                      router.push(`/dataset/${findDatasetID(dataset)}?searchType=meta&providerID=${providerID}`)
+                      router.push(`/dataset/${findDatasetID(dataset)}?searchType=detail&providerID=${providerID}`)
                     }
                   }}
                 >

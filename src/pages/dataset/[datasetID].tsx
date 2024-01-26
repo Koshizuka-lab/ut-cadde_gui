@@ -66,6 +66,16 @@ const Page: NextPage = () => {
         })
         .then((data: SearchResponse) => {
           setDataset(data.result.results[0]);
+          if (searchType === "detail") {
+            setResourceStates(data.result.results[0].resources.map((resource) => {
+              return {
+                resource: resource,
+                blob: null,
+                isChecked: false,
+                verification: "unverified",
+              }
+            }))
+          }
         })
         .catch(error => {
           alert(error.message)
@@ -93,7 +103,7 @@ const Page: NextPage = () => {
       return res.json()
     })
     .then((data: SearchResponse) => {
-      console.log(data)
+      console.log(data);
       const dataset = data.result.results[0];
       setDataset(dataset);
       setSearchType("detail");
@@ -229,7 +239,7 @@ const Page: NextPage = () => {
           <Loading />
         </div>
       )}
-      {dataset && (
+      {dataset && resourceStates && (
         <div className="flex flex-col w-full px-10 py-10">
           <DatasetView dataset={dataset} />
           { searchType === "meta" && (
