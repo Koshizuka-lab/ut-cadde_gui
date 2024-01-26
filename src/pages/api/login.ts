@@ -1,8 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { LoginAuthResponse, LoginErrorResponse } from "@/types/api";
+
 import fetchHttps from "./fetchHttps";
 
-export default function login(req: NextApiRequest, res: NextApiResponse) {
+export default function login(
+  req: NextApiRequest,
+  res: NextApiResponse<LoginAuthResponse | { message: string }>,
+) {
   const { userID, password } = req.body as { userID: string; password: string };
 
   const client_id = "consumer1_webapp";
@@ -21,19 +26,19 @@ export default function login(req: NextApiRequest, res: NextApiResponse) {
       password: password,
     }),
   })
-    .then((res) => {
-      if (!res.ok) {
-        throw res;
+    .then(async (response) => {
+      if (!response.ok) {
+        const error = (await response.json()) as LoginErrorResponse;
+        res
+          .status(error.status)
+          .json({ message: error.detail.error_description });
       } else {
-        return res.json();
+        const data = (await response.json()) as LoginAuthResponse;
+        res.status(200).json(data);
       }
     })
-    .then((data) => {
-      console.log(data);
-      res.status(200).json(data);
-    })
-    .catch((error: { status: number }) => {
+    .catch((error) => {
       console.log(error);
-      res.status(error.status).json({ error: "login failed" });
+      res.status(500).json({ message: "internal server error" });
     });
 }

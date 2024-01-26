@@ -29,12 +29,13 @@ const Page: NextPage = () => {
         password: password,
       }),
     })
-      .then((res) => {
-        console.log(res);
+      .then(async (res) => {
         if (!res.ok) {
-          throw new Error("error");
+          const error = (await res.json()) as { message: string };
+          throw error;
+        } else {
+          return res.json();
         }
-        return res.json();
       })
       .then((data: LoginAuthResponse) => {
         console.log(data);
@@ -49,9 +50,9 @@ const Page: NextPage = () => {
         Cookies.set("user_id", userID, { expires: 1, path: "/" });
         router.push("/settings");
       })
-      .catch((error) => {
+      .catch((error: { message: string }) => {
         console.log(error);
-        alert("ID or Password is invalid");
+        alert(error.message);
       });
   };
 

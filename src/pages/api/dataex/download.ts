@@ -1,8 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { SearchErrorResponse } from "@/types/api";
+
 import fetchHttps from "../fetchHttps";
 
-export default function download(req: NextApiRequest, res: NextApiResponse) {
+export default async function download(
+  req: NextApiRequest,
+  res: NextApiResponse<string | { message: string }>,
+) {
   const headers = {
     "Content-Type": "application/json",
     "Cache-Control": "no-cache",
@@ -13,23 +18,22 @@ export default function download(req: NextApiRequest, res: NextApiResponse) {
   };
   const url =
     (req.headers["consumer-connector-origin"] as string) + "cadde/api/v4/file";
-  fetchHttps(url, {
-    method: "GET",
-    headers: headers,
-  })
-    .then((res) => {
-      if (!res.ok) {
-        throw res;
-      } else {
-        return res.text();
-      }
-    })
-    .then((data) => {
-      console.log(data);
-      res.status(200).send(data);
-    })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).json({ error: "download failed" });
+  try {
+    const response = await fetchHttps(url, {
+      method: "GET",
+      headers: headers,
     });
+
+    if (response.ok) {
+      const data = await response.text();
+      res.status(200).send(data);
+    } else {
+      const error: SearchErrorResponse =
+        (await response.json()) as SearchErrorResponse;
+      res.status(error.status).json({ message: error.detail });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "internal server error" });
+  }
 }

@@ -30,7 +30,6 @@ async function refreshToken() {
 
 export const fetchWithRefresh = async (url: string, options: FetchOptions) => {
   let response = await fetch(url, options);
-
   // アクセストークンの期限切れを検知
   if (response.status === 401) {
     await refreshToken(); // トークンをリフレッシュ
@@ -39,9 +38,6 @@ export const fetchWithRefresh = async (url: string, options: FetchOptions) => {
     }
     response = await fetch(url, options); // リクエストを再試行
   }
-
-  if (!response.ok) throw new Error("Network response was not ok");
-
   return response;
 };
 

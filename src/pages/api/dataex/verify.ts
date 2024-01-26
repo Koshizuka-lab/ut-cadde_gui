@@ -42,6 +42,6 @@ export default function verify(req: NextApiRequest, res: NextApiResponse) {
     })
     .catch((error) => {
       console.log(error);
-      res.status(500).json({ error: "verification failed" });
+      res.status(500).json({ message: "verification failed" });
     });
 }

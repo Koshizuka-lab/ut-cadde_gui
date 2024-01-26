@@ -49,3 +49,19 @@ export interface SearchResponse {
   success: boolean;
   result: Catalog;
 }
+
+export interface SearchErrorResponse {
+  detail: string;
+  status: number;
+  title: string;
+  type: string;
+}
+
+export interface LoginErrorResponse {
+  message: string;
+  detail: {
+    error: string;
+    error_description: string;
+  };
+  status: number;
+}

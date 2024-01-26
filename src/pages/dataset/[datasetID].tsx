@@ -71,9 +71,10 @@ const Page: NextPage = () => {
   useEffect(() => {
     if (url) {
       fetchWithRefresh(url, options)
-        .then((res) => {
+        .then(async (res) => {
           if (!res.ok) {
-            throw res;
+            const data = (await res.json()) as { message: string };
+            throw data;
           }
           return res.json();
         })
@@ -111,9 +112,10 @@ const Page: NextPage = () => {
     };
     setLoading(true);
     fetchWithRefresh(requestUrl, requestOptions)
-      .then((res) => {
+      .then(async (res) => {
         if (!res.ok) {
-          throw res;
+          const data = (await res.json()) as { message: string };
+          throw data;
         }
         return res.json();
       })
@@ -239,9 +241,10 @@ const Page: NextPage = () => {
       },
     };
     const blob = await fetchWithRefresh(requestUrl, requestOptions)
-      .then((res) => {
+      .then(async (res) => {
         if (!res.ok) {
-          throw res;
+          const data = (await res.json()) as { message: string };
+          throw data;
         } else {
           return res.blob();
         }
