@@ -19,7 +19,13 @@ export default function refresh(req: NextApiRequest, res: NextApiResponse) {
             "refresh_token": refresh_token, 
         })
     })
-    .then((res) => res.json())
+    .then((res) => {
+        if (!res.ok) {
+            throw res
+        } else {
+            return res.json()
+        }
+    })
     .then((data) => {
         console.log(data)
         res.status(200).json(data)

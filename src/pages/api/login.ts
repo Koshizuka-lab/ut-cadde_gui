@@ -25,7 +25,7 @@ export default function login(req: NextApiRequest, res: NextApiResponse) {
         if (!res.ok) {
             throw res
         } else {
-            return res
+            return res.json()
         }
     })
     .then((data) => {

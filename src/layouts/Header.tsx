@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 export const Header = () => {
   const router = useRouter();
-  const userID = Cookies.get("user_id");
+  const [userID, setUserID] = useState<string>("");
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<HTMLDivElement>(null);
@@ -23,10 +23,11 @@ export const Header = () => {
   }, []);
 
   useEffect(() => {
-    if (!userID) {
-      router.push("/signin");
+    const clientUserID = Cookies.get("user_id");
+    if (clientUserID) {
+      setUserID(clientUserID);
     }
-  })
+  }, []);
 
   return (
     <div className="fixed top-0 left-0  bg-white h-16 w-full z-10 flex justify-between items-center px-10 border-b border-gray">
