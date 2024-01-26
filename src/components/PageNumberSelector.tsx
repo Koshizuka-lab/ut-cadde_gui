@@ -7,9 +7,15 @@ export const PageNumberSelector = (props: {
   setDisplayCount: React.Dispatch<React.SetStateAction<number>>;
   dataCount: number;
 }) => {
-  const { pageNumber, setPageNumber, displayCount, setDisplayCount, dataCount } = props;
+  const {
+    pageNumber,
+    setPageNumber,
+    displayCount,
+    setDisplayCount,
+    dataCount,
+  } = props;
   const maxPageNumber = useMemo(() => {
-    return Math.ceil(dataCount / displayCount)
+    return Math.ceil(dataCount / displayCount);
   }, [dataCount, displayCount]);
   const [open, setOpen] = useState<boolean>(false);
   const options = [5, 10, 20, 50];
@@ -48,7 +54,7 @@ export const PageNumberSelector = (props: {
     <div className="flex flex-row flex-basis items-center w-full">
       <div className="basis-1/3" />
       <div className="basis-1/3 flex flex-row gap-2 justify-center">
-        { pageNumber > 1 ? (
+        {pageNumber > 1 ? (
           <div className="bg-white border border-primary">
             <button
               className="w-8 h-8 pt-1"
@@ -67,7 +73,15 @@ export const PageNumberSelector = (props: {
           <div className="w-8 h-8" />
         )}
         {pageNumbers.map((num, index) => {
-          if (num === -1) return (<div key={index} className="w-8 h-8 flex justify-center items-center text-primary">...</div>);
+          if (num === -1)
+            return (
+              <div
+                key={index}
+                className="w-8 h-8 flex justify-center items-center text-primary"
+              >
+                ...
+              </div>
+            );
           const bgColor = num === pageNumber ? "bg-primary" : "bg-white";
           const textColor = num === pageNumber ? "text-white" : "text-primary";
           return (
@@ -86,7 +100,7 @@ export const PageNumberSelector = (props: {
             </div>
           );
         })}
-        { pageNumber < maxPageNumber ? (
+        {pageNumber < maxPageNumber ? (
           <div className="bg-white border border-primary">
             <button
               className="w-8 h-8 pt-1"
@@ -106,9 +120,7 @@ export const PageNumberSelector = (props: {
         )}
       </div>
       <div className="basis-1/3 flex flex-row gap-2 items-center justify-end">
-        <div className="font-inter">
-          Displayed Results
-        </div>
+        <div className="font-inter">Displayed Results</div>
         <div className="flex flex-row relative">
           <div className="flex flex-col justify-center items-center border border-primary w-16 h-8 font-inter">
             {displayCount}
@@ -116,7 +128,7 @@ export const PageNumberSelector = (props: {
           <button
             className="w-8 h-8 font-bold material-symbols-outlined text-white bg-primary"
             onClick={() => {
-              setOpen(!open)
+              setOpen(!open);
             }}
           >
             expand_more
@@ -124,9 +136,13 @@ export const PageNumberSelector = (props: {
           {open && (
             <div className="absolute top-9 left-0 w-24 bg-white border border-gray shadow-md">
               {options.map((option, index) => {
-                const text = (option === displayCount) ? "text-white" : "text-black";
-                const bg = (option === displayCount) ? "bg-primary" : "bg-white";
-                const hover = (option === displayCount) ? "" : "hover:bg-primary hover:bg-opacity-10";
+                const text =
+                  option === displayCount ? "text-white" : "text-black";
+                const bg = option === displayCount ? "bg-primary" : "bg-white";
+                const hover =
+                  option === displayCount
+                    ? ""
+                    : "hover:bg-primary hover:bg-opacity-10";
                 return (
                   <div
                     className={`w-full h-10 flex justify-start items-center font-inter px-5 cursor-pointer ${text} ${bg} ${hover}`}
@@ -139,8 +155,8 @@ export const PageNumberSelector = (props: {
                   >
                     {option}
                   </div>
-                  )}
-              )}
+                );
+              })}
             </div>
           )}
         </div>

@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { consumerConnectorSlice } from "./slices/consumerConnectorSlice";
+import { combineReducers } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import thunk from "redux-thunk";
-import { combineReducers } from "@reduxjs/toolkit";
+
+import { consumerConnectorSlice } from "./slices/consumerConnectorSlice";
 
 const reducers = combineReducers({
   consumerConnector: consumerConnectorSlice.reducer,

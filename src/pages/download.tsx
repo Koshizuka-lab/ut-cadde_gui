@@ -1,48 +1,52 @@
-import { InputForm } from "@/components/InputForm";
-import { FetchOptions } from "@/hooks/useFetch";
-import { Layout } from "@/layouts/Layout";
+import Cookies from "js-cookie";
 import { NextPage } from "next";
 import { useState } from "react";
+
 import { downloadFile } from "@/hooks/downloadFile";
 import { fetchWithRefresh } from "@/hooks/useFetch";
+import { FetchOptions } from "@/hooks/useFetch";
 import { useAppSelector } from "@/hooks/useStore";
-import Cookies from "js-cookie";
 
+import { InputForm } from "@/components/InputForm";
+
+import { Layout } from "@/layouts/Layout";
 
 const Page: NextPage = () => {
   const [providerID, setProviderID] = useState<string>("");
   const [resourceURL, setResourceURL] = useState<string>("");
   const [resourceAPIType, setResourceAPIType] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
-  const consumerConnectorOrigin = useAppSelector(state => state.consumerConnector.origin);
+  const consumerConnectorOrigin = useAppSelector(
+    (state) => state.consumerConnector.origin,
+  );
 
   const handleSubmit = () => {
     const requestUrl = "/api/dataex/download";
     const requestOptions: FetchOptions = {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${Cookies.get("access_token")}`,
+        Authorization: `Bearer ${Cookies.get("access_token")}`,
         "x-cadde-provider": providerID,
         "x-cadde-resource-url": resourceURL,
         "x-cadde-resource-api-type": resourceAPIType,
         "consumer-connector-origin": consumerConnectorOrigin,
-      }
-    }
+      },
+    };
     fetchWithRefresh(requestUrl, requestOptions)
       .then((res) => {
         if (!res.ok) {
           throw res;
         } else {
-          return res.blob()
+          return res.blob();
         }
       })
       .then((blob: Blob) => {
-        downloadFile(blob, fileName)
+        downloadFile(blob, fileName);
       })
-      .catch(error => {
+      .catch((error: { message: string }) => {
         alert(error.message);
-      })
-  }
+      });
+  };
 
   return (
     <Layout>
@@ -90,4 +94,4 @@ const Page: NextPage = () => {
   );
 };
 
-export default Page
+export default Page;

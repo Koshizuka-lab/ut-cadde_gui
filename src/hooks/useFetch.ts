@@ -1,27 +1,29 @@
-import { useCallback, useState } from 'react';
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
+import { useCallback, useState } from "react";
+
+import { LoginAuthResponse } from "@/types/api";
 
 export interface FetchOptions extends RequestInit {
   headers: {
-    'Authorization'?: string,
-    'x-cadde-provider'?: string,
-    'x-cadde-resource-url'?: string,
-    'x-cadde-resource-api-type'?: string,
-    'consumer-connector-origin'?: string,
-  }
+    Authorization?: string;
+    "x-cadde-provider"?: string;
+    "x-cadde-resource-url"?: string;
+    "x-cadde-resource-api-type"?: string;
+    "consumer-connector-origin"?: string;
+  };
 }
 
 async function refreshToken() {
   const response = await fetch("/api/refresh", {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      "refresh_token": Cookies.get("refresh_token"),
-    })
+      refresh_token: Cookies.get("refresh_token"),
+    }),
   });
-  const data = await response.json();
+  const data: LoginAuthResponse = (await response.json()) as LoginAuthResponse;
   Cookies.set("access_token", data.access_token);
   Cookies.set("refresh_token", data.refresh_token);
 }
@@ -38,16 +40,19 @@ export const fetchWithRefresh = async (url: string, options: FetchOptions) => {
     response = await fetch(url, options); // リクエストを再試行
   }
 
-  if (!response.ok) throw new Error('Network response was not ok');
+  if (!response.ok) throw new Error("Network response was not ok");
 
   return response;
-}
+};
 
-export function useFetch<T>(url: string, options: FetchOptions): {
-  data: T | null,
-  error: Error | null,
-  loading: boolean,
-  fetchData: () => Promise<void>,
+export function useFetch<T>(
+  url: string,
+  options: FetchOptions,
+): {
+  data: T | null;
+  error: Error | null;
+  loading: boolean;
+  fetchData: () => Promise<void>;
 } {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -59,7 +64,7 @@ export function useFetch<T>(url: string, options: FetchOptions): {
     try {
       const response = await fetchWithRefresh(url, options);
 
-      const responseData = await response.json() as T;
+      const responseData = (await response.json()) as T;
       console.log("--- useFetch ---");
       console.log("url", url);
       console.log("options", options);

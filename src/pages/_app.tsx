@@ -1,7 +1,10 @@
-import '@/styles/globals.css'
-import type { AppProps } from 'next/app'
-import { store } from "@/store/store";
+import "@/styles/globals.css";
 import { Provider } from "react-redux";
+
+import { store } from "@/store/store";
+
+import type { AppProps } from "next/app";
+
 // import { persistStore } from "redux-persist";
 // import { PersistGate } from "redux-persist/integration/react";
 
@@ -13,5 +16,5 @@ export default function App({ Component, pageProps }: AppProps) {
       <Component {...pageProps} />
       {/* </PersistGate> */}
     </Provider>
-  )
+  );
 }

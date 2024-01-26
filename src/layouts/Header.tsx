@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -10,7 +11,11 @@ export const Header = () => {
   const iconRef = useRef<HTMLDivElement>(null);
 
   const closeMenu = (event: MouseEvent) => {
-    if (menuRef.current && !menuRef.current.contains(event.target as Node) && !iconRef.current?.contains(event.target as Node)) {
+    if (
+      menuRef.current &&
+      !menuRef.current.contains(event.target as Node) &&
+      !iconRef.current?.contains(event.target as Node)
+    ) {
       setMenuOpen(false);
     }
   };
@@ -23,12 +28,14 @@ export const Header = () => {
   }, []);
 
   useEffect(() => {
-    const clientUserID = Cookies.get("user_id");
-    if (clientUserID) {
-      setUserID(clientUserID);
-    } else {
-      router.push("/signin");
-    }
+    (async () => {
+      const clientUserID = Cookies.get("user_id");
+      if (clientUserID) {
+        setUserID(clientUserID);
+      } else {
+        await router.push("/signin");
+      }
+    })().catch((err) => console.log(err));
   }, []);
 
   return (
@@ -40,7 +47,9 @@ export const Header = () => {
           ref={iconRef}
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          <div className="material-symbols-outlined text-xl pt-1">account_circle</div>
+          <div className="material-symbols-outlined text-xl pt-1">
+            account_circle
+          </div>
           <div className="text-xl font-bold">{userID}</div>
         </div>
       )}
@@ -51,13 +60,13 @@ export const Header = () => {
         >
           <div className="flex flex-row gap-2 items-center cursor-pointer p-3 px-5">
             <div className="material-symbols-outlined text-alert">logout</div>
-            <div 
+            <div
               className="text-alert text-md font-bold font-inter cursor-pointer"
               onClick={() => {
-                router.push("/signin");
                 Cookies.remove("access_token");
                 Cookies.remove("refresh_token");
                 Cookies.remove("user_id");
+                router.push("/signin");
               }}
             >
               logout

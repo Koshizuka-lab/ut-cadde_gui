@@ -14,7 +14,7 @@ export const InputForm = (props: InputFormProps) => {
       <div className="text-md font-inter">{label}</div>
       <input
         className="bg-form border-b border-secondary w-full h-10 pl-2"
-        onChange={e => setValue(e.target.value)}
+        onChange={(e) => setValue(e.target.value)}
         value={value}
         placeholder={placeholder}
         type={type || "text"}

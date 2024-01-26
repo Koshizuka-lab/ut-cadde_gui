@@ -41,4 +41,4 @@ export const RadioThin = (props: RadioProps) => {
       </label>
     </div>
   );
-}
+};

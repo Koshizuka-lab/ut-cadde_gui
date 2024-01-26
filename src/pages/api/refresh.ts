@@ -1,37 +1,38 @@
-import { NextApiRequest, NextApiResponse } from "next"
-import fetchHttps from "./fetchHttps"
+import { NextApiRequest, NextApiResponse } from "next";
+
+import fetchHttps from "./fetchHttps";
 
 export default function refresh(req: NextApiRequest, res: NextApiResponse) {
-    const refresh_token = req.body.refresh_token
+  const { refresh_token } = req.body as { refresh_token: string };
 
-    const client_id = "consumer1_webapp"
-    const client_secret = "X0IwpZHnuFI8uduRkM5RV5A8F1XJwF3T"
-    const basic = btoa(`${client_id}:${client_secret}`)
+  const client_id = "consumer1_webapp";
+  const client_secret = "X0IwpZHnuFI8uduRkM5RV5A8F1XJwF3T";
+  const basic = btoa(`${client_id}:${client_secret}`);
 
-    const url = process.env.AUTH_API_URL + "refresh"
-    fetchHttps(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Basic ${basic}`,
-        },
-        body: JSON.stringify({
-            "refresh_token": refresh_token, 
-        })
-    })
+  const url = process.env.AUTH_API_URL + "refresh";
+  fetchHttps(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Basic ${basic}`,
+    },
+    body: JSON.stringify({
+      refresh_token: refresh_token,
+    }),
+  })
     .then((res) => {
-        if (!res.ok) {
-            throw res
-        } else {
-            return res.json()
-        }
+      if (!res.ok) {
+        throw res;
+      } else {
+        return res.json();
+      }
     })
     .then((data) => {
-        console.log(data)
-        res.status(200).json(data)
+      console.log(data);
+      res.status(200).json(data);
     })
-    .catch(error => {
-        console.log(error)
-        res.status(400).json({"error": "login failed"})
-    })
+    .catch((error) => {
+      console.log(error);
+      res.status(400).json({ error: "login failed" });
+    });
 }
