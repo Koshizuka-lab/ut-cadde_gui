@@ -13,6 +13,7 @@ import { findDatasetID } from "@/hooks/findDatasetID";
 import { FetchOptions, useFetch } from "@/hooks/useFetch";
 import { useAppSelector } from "@/hooks/useStore";
 import { PageNumberSelector } from "@/components/PageNumberSelector";
+import { Loading } from "@/components/Loading";
 
 interface SearchBoxProps {
   query: string;
@@ -164,9 +165,7 @@ const Page: NextPage = () => {
           )}
         </div>
         {loading ? (
-          <div className="flex justify-center items-center w-full h-32">
-            <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-r-4 border-primary" />
-          </div>
+          <Loading />
         ) : (
           <>
             <div className="font-bold font-inter text-2xl pt-10">

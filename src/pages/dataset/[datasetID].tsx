@@ -12,6 +12,14 @@ import { useAppSelector } from '@/hooks/useStore';
 import { findProviderID } from '@/hooks/findProviderID';
 import { DatasetView } from '@/components/DatasetView';
 import { SearchResponse } from '@/types/api';
+import { Loading } from '@/components/Loading';
+
+interface ResourceState {
+  resource: Resource;
+  blob: Blob | null;
+  isChecked: boolean;
+  verification: "verified" | "unverified" | "error";
+}
 
 const Page: NextPage = () => {
   const router = useRouter();
@@ -19,8 +27,8 @@ const Page: NextPage = () => {
   const [searchType, setSearchType] = useState<string>(router.query.searchType as string);
   const [providerID, setProviderID] = useState<string>(router.query.providerID as string);
   const [dataset, setDataset] = useState<Dataset | null>(null);
-  const [requesting, setRequesting] = useState<boolean>(false);
-  const [checkedResources, setCheckedResources] = useState<boolean[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [resourceStates, setResourceStates] = useState<ResourceState[]>([]);
   const consumerConnectorOrigin = useAppSelector(state => state.consumerConnector.origin);
 
   const url = useMemo(() => {
@@ -76,7 +84,7 @@ const Page: NextPage = () => {
         "consumer-connector-origin": consumerConnectorOrigin,
       }
     };
-    setRequesting(true);
+    setLoading(true);
     fetchWithRefresh(requestUrl, requestOptions)
     .then((res) => {
       if (!res.ok) {
@@ -90,23 +98,94 @@ const Page: NextPage = () => {
       setDataset(dataset);
       setSearchType("detail");
       setProviderID(providerID);
-      setCheckedResources(dataset.resources.map(() => false));
+      setResourceStates(dataset.resources.map((resource) => {
+        return {
+          resource: resource,
+          blob: null,
+          isChecked: false,
+          verification: "unverified",
+        }
+      }))
     })
     .catch(error => {
       alert(error.message)
     })
     .finally(() => {
-      setRequesting(false);
+      setLoading(false);
     })
   }
 
-  const download = async () => {
-    const resources = dataset?.resources.filter((_, index) => checkedResources[index]);
-    if (resources) {
-      Promise.all(resources.map((resource) => {
-        return fetchFile(resource);
-      }))
+  const verify = async () => {
+    setLoading(true);
+    const updatedResouceStates = [];
+    for (const resourceState of resourceStates) {
+      if (resourceState.isChecked) {
+        const blob = await fetchFile(resourceState.resource);
+        if (blob) {
+          resourceState.blob = blob;
+          resourceState.verification =  await fetchSignatureVerification(blob);
+        }
+      }
+      updatedResouceStates.push(resourceState);
     }
+    setResourceStates(updatedResouceStates);
+    setLoading(false);
+  }
+
+  const download = async () => {
+    for (const resourceState of resourceStates) {
+      if (resourceState.isChecked && resourceState.blob && resourceState.verification === "verified") {
+        downloadFile(resourceState.blob, resourceState.resource.name);
+      }
+    }
+  }
+
+  const disableDownload = useMemo(() => {
+    for (const resourceState of resourceStates) {
+      if (resourceState.isChecked && resourceState.verification !== "verified") {
+        return true;
+      }
+    }
+    if (resourceStates.every((resourceState) => !resourceState.isChecked)) {
+      return true;
+    }
+    return false;
+  }, [resourceStates]);
+
+  const fetchSignatureVerification = async (blob: Blob) => {
+    const requestUrl = "/api/dataex/verify";
+    const requestOptions: FetchOptions = {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${Cookies.get("access_token")}`,
+        "x-cadde-provider": providerID,
+      },
+      // TODO: verifierID, data, trust_seal_id
+      body: JSON.stringify({
+        "verifierID": "verifierID",
+        "data": "data",
+        "trust_seal_id": "trust_seal_id",
+      })
+    }
+    
+    const verification: "verified" | "error" = await fetchWithRefresh(requestUrl, requestOptions)
+      .then((res) => {
+        if (!res.ok) {
+          throw res;
+        }
+        return res.json()
+      })
+      .then((data) => {
+        if (data.result === "OK") {
+          return "verified";
+        } else {
+          return "error";
+        }
+      })
+      .catch(error => {
+        return "error";
+      })
+    return verification;
   }
 
   const fetchFile = async (resource: Resource) => {
@@ -121,7 +200,7 @@ const Page: NextPage = () => {
         "consumer-connector-origin": consumerConnectorOrigin,
       }
     }
-    fetchWithRefresh(requestUrl, requestOptions)
+    const blob = await fetchWithRefresh(requestUrl, requestOptions)
       .then((res) => {
         if (!res.ok) {
           throw res;
@@ -130,15 +209,26 @@ const Page: NextPage = () => {
         }
       })
       .then((blob: Blob) => {
-        downloadFile(blob, resource.name)
+        return blob;
       })
       .catch(error => {
         alert(error.message);
+        return null;
       })
+    if (blob) {
+      return blob;
+    } else {
+      return null;
+    }
   }
 
   return <>
     <Layout>
+      {loading && (
+        <div className="fixed inset-0 bg-secondary bg-opacity-30 z-10 flex justify-center items-center">
+          <Loading />
+        </div>
+      )}
       {dataset && (
         <div className="flex flex-col w-full px-10 py-10">
           <DatasetView dataset={dataset} />
@@ -147,7 +237,7 @@ const Page: NextPage = () => {
               <button
                 className="bg-primary text-white px-20 py-5 text-2xl font-inter font-bold"
                 onClick={() => requestResources(dataset)}
-                disabled={requesting}
+                disabled={loading}
               >
                 Request Resources
               </button>
@@ -168,33 +258,59 @@ const Page: NextPage = () => {
                         <th className="px-4 py-2">format</th>
                         <th className="px-4 py-2">last updated</th>
                         <th className="px-4 py-2">api type</th>
+                        <th className="px-4 py-2">verification</th>
                       </tr>
                     </thead>
                     <tbody>
                       {dataset.resources.map((resource, index) => {
-                        const borderColor = checkedResources[index] ? "border-primary" : "border-secondary";
+                        const borderColor = resourceStates[index].isChecked ? "border-primary" : "border-secondary";
                         return (
                           <>
                         <tr
                           key={index}
                           className={`border ${borderColor} hover:border-primary hover:bg-primary hover:bg-opacity-10 cursor-pointer`}
                           onClick={() => {
-                            const newCheckedResources = checkedResources.slice();
-                            newCheckedResources[index] = !newCheckedResources[index];
-                            setCheckedResources(newCheckedResources);
+                            setResourceStates(resourceStates.map((resourceState, i) => {
+                              if (i === index) {
+                                resourceState.isChecked = !resourceState.isChecked;
+                              }
+                              return resourceState;
+                            }))
                           }}
                         >
                           <td className="px-4 pt-2">
                             <input
                               className="w-5 h-5 accent-primary"
                               type="checkbox"
-                              checked={checkedResources[index]}
+                              checked={resourceStates[index].isChecked}
+                              readOnly
                             />
                           </td>
                           <td className="px-4 py-4">{resource.name}</td>
                           <td className="px-4 py-4">{resource.format}</td>
                           <td className="px-4 py-4">{formatDate(new Date(resource.last_modified), true)}</td>
                           <td className="px-4 py-4">file/http</td>
+                          {resourceStates[index].verification === "verified" && (
+                            <td className="px-4 py-4 flex justify-center items-center">
+                              <div className="material-symbols-outlined text-success">
+                                check_circle
+                              </div>
+                            </td>
+                          )}
+                          {resourceStates[index].verification === "unverified" && (
+                            <td className="px-4 py-4 flex justify-center items-center">
+                              <div className="material-symbols-outlined text-secondary">
+                                help_outline
+                              </div>
+                            </td>
+                          )}
+                          {resourceStates[index].verification === "error" && (
+                            <td className="px-4 py-4 flex justify-center items-center">
+                              <div className="material-symbols-outlined text-alert">
+                                error_outline
+                              </div>
+                            </td>
+                          )}
                         </tr>
                         <tr className="h-3">
                           <td colSpan={5} />
@@ -205,8 +321,15 @@ const Page: NextPage = () => {
                   </table>
                   <div className="flex flex-row justify-end w-full pt-5">
                     <button
-                      className="bg-primary text-white w-36 h-10 font-inter font-bold"
+                      className="bg-primary text-white w-36 h-10 font-inter font-bold mr-5"
+                      onClick={verify}
+                    >
+                      Verify signature
+                    </button>
+                    <button
+                      className="bg-primary text-white w-36 h-10 font-inter font-bold disabled:opacity-50"
                       onClick={download}
+                      disabled={disableDownload}
                     >
                       Download
                     </button>

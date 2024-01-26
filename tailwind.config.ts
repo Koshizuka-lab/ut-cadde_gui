@@ -19,6 +19,7 @@ const config: Config = {
         secondary: '#C9D0DC',
         gray: '#E0E0E0',
         form: '#F3F3F7',
+        success: '#28a745',
         alert: '#FF0000',
       },
       fontFamily: {

@@ -26,6 +26,8 @@ export const Header = () => {
     const clientUserID = Cookies.get("user_id");
     if (clientUserID) {
       setUserID(clientUserID);
+    } else {
+      router.push("/signin");
     }
   }, []);
 
