@@ -12,11 +12,7 @@ const Page: NextPage = () => {
     router.push("/signin");
   }, []);
 
-  return <div>Index Page
-    {Cookies.get("access_token")}
-    {Cookies.get("refresh_token")}
-    {Cookies.get("user_id")}
-  </div>;
+  return <div>Index Page</div>;
 }
 
 export default Page
