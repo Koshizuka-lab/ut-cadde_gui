@@ -1,5 +1,4 @@
 import Cookies from "js-cookie";
-import { useCallback, useState } from "react";
 
 import { LoginAuthResponse } from "@/types/api";
 
@@ -40,39 +39,3 @@ export const fetchWithRefresh = async (url: string, options: FetchOptions) => {
   }
   return response;
 };
-
-export function useFetch<T>(
-  url: string,
-  options: FetchOptions,
-): {
-  data: T | null;
-  error: Error | null;
-  loading: boolean;
-  fetchData: () => Promise<void>;
-} {
-  const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-
-    try {
-      const response = await fetchWithRefresh(url, options);
-
-      const responseData = (await response.json()) as T;
-      console.log("--- useFetch ---");
-      console.log("url", url);
-      console.log("options", options);
-      console.log("responseData", responseData);
-      console.log("----------------");
-      setData(responseData);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [url, options]);
-
-  return { data, error, loading, fetchData };
-}

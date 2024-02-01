@@ -1,57 +1,26 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import Cookies from "js-cookie";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
+import Select from "react-select";
 
 import { findDatasetID } from "@/hooks/findDatasetID";
 import { joinFormats, extractFormats } from "@/hooks/format";
 import { formatDate } from "@/hooks/formatDate";
-import { FetchOptions, useFetch } from "@/hooks/useFetch";
+import { FetchOptions, fetchWithRefresh } from "@/hooks/useFetch";
 import { useAppSelector } from "@/hooks/useStore";
 
 import { InputForm } from "@/components/InputForm";
 import { Loading } from "@/components/Loading";
 import { PageNumberSelector } from "@/components/PageNumberSelector";
-import { Radio, RadioThin } from "@/components/Radio";
 
 import { SearchResponse } from "@/types/api";
 import { Dataset } from "@/types/ckan";
 
 import { Layout } from "@/layouts/Layout";
-
-interface SearchBoxProps {
-  query: string;
-  setQuery: (query: string) => void;
-  onClick: () => void;
-}
-const SearchBox = (props: SearchBoxProps) => {
-  const { query, setQuery, onClick } = props;
-  return (
-    <form
-      className="flex flex-row justify-center py-5 w-full"
-      onSubmit={(e) => {
-        e.preventDefault();
-        onClick();
-      }}
-    >
-      <input
-        className="border boreder-primary w-full h-10 pl-3"
-        type="text"
-        onChange={(e) => setQuery(e.target.value)}
-        value={query}
-        placeholder="Find datasets by keywords"
-      />
-      <button
-        className="material-symbols-outlined text-primary border-b border-t border-r border-primary w-16 h-10"
-        type="submit"
-      >
-        search
-      </button>
-    </form>
-  );
-};
 
 const Page: NextPage = () => {
   const router = useRouter();
@@ -65,6 +34,8 @@ const Page: NextPage = () => {
   const consumerConnectorOrigin = useAppSelector(
     (state) => state.consumerConnector.origin,
   );
+  const [data, setData] = useState<SearchResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const url = useMemo(() => {
     if (dataspace === "dataex") {
@@ -97,7 +68,28 @@ const Page: NextPage = () => {
     }
   }, [searchType, providerID, consumerConnectorOrigin]);
 
-  const { data, loading, fetchData } = useFetch<SearchResponse>(url, options);
+
+  const fetchData = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    fetchWithRefresh(url, options)
+    .then(async (res) => {
+      if (!res.ok) {
+        const data = (await res.json()) as { message: string };
+        throw data;
+      }
+      const data = (await res.json()) as SearchResponse;
+      setData(data);
+    })
+    .catch((error: { message: string }) => {
+      alert(error.message);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  }
+
 
   const count = useMemo(() => {
     return data?.result.results.length || 0;
@@ -115,65 +107,103 @@ const Page: NextPage = () => {
   return (
     <>
       <Layout>
-        <div className="bg-white flex flex-col w-full px-20 py-10">
-          <div className="flex flex-col items-center">
-            <div className="text-4xl text-primary font-bold font-inter pt-10">
+        <div className="bg-primary w-full h-40 relative">
+          <div className="flex flex-row justify-start items-start h-full pt-10 pl-5">
+            <div className="text-4xl text-white font-bold font-inter">
               Search for dataset in the Dataspace
             </div>
-            <SearchBox query={query} setQuery={setQuery} onClick={fetchData} />
           </div>
-          <div className="flex flex-col items-start p-5">
-            <Radio
-              id="dataex"
-              label="Search DATA-EX"
-              checked={dataspace === "dataex"}
-              onChange={() => setDataspace("dataex")}
-            />
-            {dataspace === "dataex" && (
-              <>
-                <div className="pl-10">
-                  <RadioThin
-                    id="meta"
-                    label="Meta Search"
-                    checked={searchType === "meta"}
-                    onChange={() => setSearchType("meta")}
+          <div className="absolute top-28 w-full px-20">
+            <div className="bg-white border">
+              <form className="flex flex-col w-full p-5">
+                <div className="flex flex-row border border-primary h-10 w-full">
+                  <div className="material-symbols-outlined text-primary pt-2 pl-3 pr-2">
+                    search
+                  </div>
+                  <input
+                    className="w-full pl-3"
+                    type="text"
+                    onChange={(e) => setQuery(e.target.value)}
+                    value={query}
+                    placeholder="Find datasets by keywords"
                   />
                 </div>
-                <div className="pl-10">
-                  <RadioThin
-                    id="detail"
-                    label="Detail Search"
-                    checked={searchType === "detail"}
-                    onChange={() => setSearchType("detail")}
-                  />
-                </div>
-                {searchType === "detail" && (
-                  <div className="pl-20 pb-2">
-                    <InputForm
-                      label="DATA-EX ID (Provider)"
-                      value={providerID}
-                      setValue={setProviderID}
+                <div className="flex flex-row justify-between flex-wrap gap-4 items-end pt-5">
+                  <div className="flex flex-col items-start">
+                    <div className="pl-2">dataspace</div>
+                    <Select 
+                      className="w-48"
+                      styles={{
+                        control: (styles) => ({
+                          ...styles,
+                          backgroundColor: "white",
+                          borderColor: "#00479D",
+                          borderRadius: "0",
+                        }),
+                      }}
+                      options={[
+                        { value: "dataex", label: "DATA-EX" },
+                        { value: "ids-dsc", label: "IDS Dataspace" },
+                      ]}
+                      value={{ value: dataspace, label: dataspace }}
+                      onChange={(selected) => setDataspace((selected as { value: string, label: string }).value || "dataex")}
                     />
                   </div>
-                )}
-              </>
-            )}
-            <Radio
-              id="ids-dsc"
-              label="Search IDS Dataspace"
-              checked={dataspace === "ids-dsc"}
-              onChange={() => setDataspace("ids-dsc")}
-            />
-            {dataspace === "ids-dsc" && (
-              <div className="pl-10">
-                <InputForm
-                  label="Provider URL"
-                  value={providerURL}
-                  setValue={setProviderURL}
-                />
-              </div>
-            )}
+                  <div className="flex flex-col items-start">
+                    <div className="pl-2">search type</div>
+                    <Select 
+                      className="w-48"
+                      styles={{
+                        control: (styles) => ({
+                          ...styles,
+                          backgroundColor: "white",
+                          borderColor: "#00479D",
+                          borderRadius: "0",
+                        }),
+                      }}
+                      options={[
+                        { value: "meta", label: "Meta Search" },
+                        { value: "detail", label: "Detail Search" },
+                      ]}
+                      value={{ value: searchType, label: searchType }}
+                      onChange={(selected) => setSearchType((selected as { value: string, label: string }).value || "meta")}
+                      isDisabled={dataspace === "ids-dsc"}
+                    />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    {dataspace === "ids-dsc" ? (
+                      <>
+                        <div className="pl-2">provider URL</div>
+                        <InputForm
+                          value={providerURL}
+                          setValue={setProviderURL}
+                          label={""}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <div className="pl-2">DATA-EX ID (Provider)</div>
+                        <InputForm
+                          value={providerID}
+                          setValue={setProviderID}
+                          disabled={searchType === "meta"}
+                          label={""}
+                        />
+                      </>
+                    )}
+                  </div>
+                  <button
+                    className="bg-primary text-white w-48 h-10 font-bold shadow-md"
+                    onClick={fetchData}
+                  >
+                    Search
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
+        </div>
+        <div className="bg-white flex flex-col w-full px-20 pb-10 pt-48">
           {loading ? (
             <Loading />
           ) : (

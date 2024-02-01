@@ -21,8 +21,9 @@ import { Layout } from "@/layouts/Layout";
 interface ResourceState {
   resource: Resource;
   blob: Blob | null;
+  blobStatus: "loaded" | "undefined" | "error";
   isChecked: boolean;
-  verification: "verified" | "unverified" | "error";
+  verification: "verified" | "undefined" | "error";
 }
 
 const Page: NextPage = () => {
@@ -86,8 +87,9 @@ const Page: NextPage = () => {
                 return {
                   resource: resource,
                   blob: null,
+                  blobStatus: "undefined",
                   isChecked: false,
-                  verification: "unverified",
+                  verification: "undefined",
                 };
               }),
             );
@@ -130,8 +132,9 @@ const Page: NextPage = () => {
             return {
               resource: resource,
               blob: null,
+              blobStatus: "undefined",
               isChecked: false,
-              verification: "unverified",
+              verification: "undefined",
             };
           }),
         );
@@ -144,16 +147,27 @@ const Page: NextPage = () => {
       });
   };
 
-  const verify = async () => {
+  const fetchData = async () => {
     setLoading(true);
     const updatedResouceStates = [];
     for (const resourceState of resourceStates) {
       if (resourceState.isChecked) {
         const blob = await fetchFile(resourceState.resource);
-        if (blob) {
-          resourceState.blob = blob;
-          resourceState.verification = await fetchSignatureVerification(blob);
-        }
+        resourceState.blob = blob;
+        resourceState.blobStatus = blob ? "loaded" : "error";
+      }
+      updatedResouceStates.push(resourceState);
+    }
+    setResourceStates(updatedResouceStates);
+    setLoading(false);
+  }
+
+  const verify = async () => {
+    setLoading(true);
+    const updatedResouceStates = [];
+    for (const resourceState of resourceStates) {
+      if (resourceState.isChecked && resourceState.blob) {
+        resourceState.verification = await fetchSignatureVerification(resourceState.blob);
       }
       updatedResouceStates.push(resourceState);
     }
@@ -172,6 +186,18 @@ const Page: NextPage = () => {
       }
     }
   };
+
+  const disableVerify = useMemo(() => {
+    for (const resourceState of resourceStates) {
+      if (resourceState.isChecked && resourceState.blobStatus !== "loaded") {
+        return true;
+      }
+    }
+    if (resourceStates.every((resourceState) => !resourceState.isChecked)) {
+      return true;
+    }
+    return false;
+  }, [resourceStates]);
 
   const disableDownload = useMemo(() => {
     for (const resourceState of resourceStates) {
@@ -256,11 +282,7 @@ const Page: NextPage = () => {
         alert(error.message);
         return null;
       });
-    if (blob) {
-      return blob;
-    } else {
-      return null;
-    }
+    return blob;
   };
 
   return (
@@ -300,6 +322,7 @@ const Page: NextPage = () => {
                           <th className="px-4 py-2">format</th>
                           <th className="px-4 py-2">last updated</th>
                           <th className="px-4 py-2">api type</th>
+                          <th className="px-4 py-2">data</th>
                           <th className="px-4 py-2">verification</th>
                         </tr>
                       </thead>
@@ -342,6 +365,27 @@ const Page: NextPage = () => {
                                   )}
                                 </td>
                                 <td className="px-4 py-4">file/http</td>
+                                {resourceStates[index].blobStatus === "loaded" && (
+                                  <td className="px-4 py-4">
+                                    <div className="material-symbols-outlined text-success">
+                                      check_circle
+                                    </div>
+                                  </td>
+                                )}
+                                {resourceStates[index].blobStatus === "undefined" && (
+                                  <td className="px-4 py-4">
+                                    <div className="material-symbols-outlined text-secondary">
+                                      help_outline
+                                    </div>
+                                  </td>
+                                )}
+                                {resourceStates[index].blobStatus === "error" && (
+                                  <td className="px-4 py-4">
+                                    <div className="material-symbols-outlined text-alert">
+                                      error_outline
+                                    </div>
+                                  </td>
+                                )}
                                 {resourceStates[index].verification ===
                                   "verified" && (
                                   <td className="px-4 py-4 flex justify-center items-center">
@@ -351,7 +395,7 @@ const Page: NextPage = () => {
                                   </td>
                                 )}
                                 {resourceStates[index].verification ===
-                                  "unverified" && (
+                                  "undefined" && (
                                   <td className="px-4 py-4 flex justify-center items-center">
                                     <div className="material-symbols-outlined text-secondary">
                                       help_outline
@@ -379,9 +423,17 @@ const Page: NextPage = () => {
                       <button
                         className="bg-primary text-white w-36 h-10 font-inter font-bold mr-5"
                         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                        onClick={verify}
+                        onClick={fetchData}
                       >
-                        Verify signature
+                        Fetch Data
+                      </button>
+                      <button
+                        className="bg-primary text-white w-36 h-10 font-inter font-bold disabled:opacity-50 mr-5"
+                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                        onClick={verify}
+                        disabled={disableVerify}
+                      >
+                        Verify Signature
                       </button>
                       <button
                         className="bg-primary text-white w-36 h-10 font-inter font-bold disabled:opacity-50"
