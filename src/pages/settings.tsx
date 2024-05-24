@@ -1,19 +1,15 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
+import { useContext } from "react";
 
-import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
+import { ConsumerContext } from "@/hooks/useContext";
 
 import { InputForm } from "@/components/InputForm";
 
 import { Layout } from "@/layouts/Layout";
-import { consumerConnectorSlice } from "@/store/slices/consumerConnectorSlice";
 
 const Page: NextPage = () => {
-  const origin = useAppSelector((state) => state.consumerConnector.origin);
-  const dispatch = useAppDispatch();
-  const setOrigin = (origin: string) => {
-    dispatch(consumerConnectorSlice.actions.setOrigin(origin));
-  };
+  const { consumer, setConsumer } = useContext(ConsumerContext);
   const router = useRouter();
 
   return (
@@ -29,10 +25,9 @@ const Page: NextPage = () => {
             </div>
             <div className="flex flex-row items-end">
               <InputForm
-                label="Origin"
-                value={origin}
-                setValue={setOrigin}
-                placeholder="http://example.com/"
+                label="consumer connector url"
+                value={consumer.connectorUrl}
+                setValue={(value) => setConsumer({ ...consumer, connectorUrl: value })}
                 required
               />
             </div>

@@ -1,5 +1,5 @@
-import { extractFormats, joinFormats } from "@/hooks/format";
-import { formatDate } from "@/hooks/formatDate";
+import { extractFormats, joinFormats } from "@/utils/format";
+import { formatDate } from "@/utils/formatDate";
 
 import { Dataset } from "@/types/ckan";
 

@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 
-import { LoginAuthResponse } from "@/types/api";
+import { LoginAuthResponse } from "@/types/api_external";
 
 export interface FetchOptions extends RequestInit {
   headers: {

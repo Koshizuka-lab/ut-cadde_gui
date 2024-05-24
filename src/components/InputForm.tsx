@@ -6,13 +6,16 @@ interface InputFormProps {
   type?: string;
   required?: boolean;
   disabled?: boolean;
+  w?: string;
 }
 
 export const InputForm = (props: InputFormProps) => {
-  const { label, value, setValue, placeholder, type, required, disabled } = props;
+  const { label, value, setValue, placeholder, type, required, disabled, w } =
+    props;
+  const width = w || "w-64";
   return (
-    <div className="flex flex-col justify-left w-64">
-      <div className="text-md font-inter">{label}</div>
+    <div className={`flex flex-col justify-left ${width}`}>
+      <div className="text-md">{label}</div>
       <input
         className="bg-form border-b border-secondary w-full h-10 pl-2 disabled:bg-gray"
         onChange={(e) => setValue(e.target.value)}

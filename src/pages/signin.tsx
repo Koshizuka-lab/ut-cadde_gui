@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { InputForm } from "@/components/InputForm";
 
-import { LoginAuthResponse } from "@/types/api";
+import { LoginAuthResponse } from "@/types/api_external";
 
 import { Header } from "@/layouts/Header";
 
@@ -67,7 +67,7 @@ const Page: NextPage = () => {
             </div>
             <div className="pt-5">
               <InputForm
-                label="DATA-EX ID"
+                label="ID"
                 value={userID}
                 setValue={setUserID}
               />
@@ -87,10 +87,6 @@ const Page: NextPage = () => {
               >
                 Sign In
               </button>
-            </div>
-            <div className="text-primary font-inter text-sm">
-              Don&apos;t have DATA-EX ID?{" "}
-              <a className="text-primary underline">Create one</a>
             </div>
           </div>
         </div>

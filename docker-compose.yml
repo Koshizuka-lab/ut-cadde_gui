@@ -8,8 +8,8 @@ services:
       - .:/app
       - node_modules:/app/node_modules
       - ./cacert.pem:/etc/docker/certs.d/cacert.pem
-    # command: sh -c "npm run build && npm run start"
-    command: sh -c "npm run dev"
+    command: sh -c "npm run build && npm run start"
+    # command: sh -c "npm run dev"
     environment:
       - ROOT_CA_CERTIFICATE=/etc/docker/certs.d/cacert.pem
 volumes:

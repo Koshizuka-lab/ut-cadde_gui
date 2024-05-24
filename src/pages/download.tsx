@@ -1,11 +1,11 @@
 import Cookies from "js-cookie";
 import { NextPage } from "next";
-import { useState } from "react";
+import { useContext, useState } from "react";
 
-import { downloadFile } from "@/hooks/downloadFile";
-import { fetchWithRefresh } from "@/hooks/useFetch";
-import { FetchOptions } from "@/hooks/useFetch";
-import { useAppSelector } from "@/hooks/useStore";
+import { downloadFile } from "@/utils/downloadFile";
+
+import { ConsumerContext } from "@/hooks/useContext";
+import { fetchWithRefresh, FetchOptions } from "@/hooks/useFetch";
 
 import { InputForm } from "@/components/InputForm";
 
@@ -16,9 +16,8 @@ const Page: NextPage = () => {
   const [resourceURL, setResourceURL] = useState<string>("");
   const [resourceAPIType, setResourceAPIType] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
-  const consumerConnectorOrigin = useAppSelector(
-    (state) => state.consumerConnector.origin,
-  );
+  const { consumer } = useContext(ConsumerContext);
+  const consumerConnectorOrigin = consumer.connectorUrl;
 
   const handleSubmit = () => {
     const requestUrl = "/api/dataex/download";
@@ -59,7 +58,7 @@ const Page: NextPage = () => {
           className="flex flex-col items-start px-16 gap-8"
         >
           <InputForm
-            label="DATA-EX ID (Provider)"
+            label="Provider ID"
             value={providerID}
             setValue={setProviderID}
             required

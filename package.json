@@ -21,6 +21,7 @@
     "react-dom": "^18",
     "react-redux": "^9.1.0",
     "react-select": "^5.8.0",
+    "react-toastify": "^10.0.5",
     "redux-persist": "^6.0.0"
   },
   "devDependencies": {
@@ -34,6 +35,8 @@
     "eslint-config-next": "14.0.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
+    "pino": "^8.19.0",
+    "pino-pretty": "^11.0.0",
     "postcss": "^8",
     "prettier": "^3.2.4",
     "prettier-plugin-tailwindcss": "^0.5.11",

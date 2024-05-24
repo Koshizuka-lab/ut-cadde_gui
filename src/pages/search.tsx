@@ -5,49 +5,56 @@ import Cookies from "js-cookie";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
+import { useContext } from "react";
 import Select from "react-select";
 
-import { findDatasetID } from "@/hooks/findDatasetID";
-import { joinFormats, extractFormats } from "@/hooks/format";
-import { formatDate } from "@/hooks/formatDate";
-import { FetchOptions, fetchWithRefresh } from "@/hooks/useFetch";
-import { useAppSelector } from "@/hooks/useStore";
+import { findDatasetID } from "@/utils/findDatasetID";
+import { joinFormats, extractFormats } from "@/utils/format";
+import { formatDate } from "@/utils/formatDate";
 
+import { DatasetContext, ConsumerContext } from "@/hooks/useContext";
+import { FetchOptions, fetchWithRefresh } from "@/hooks/useFetch";
+
+import { ErrorModal } from "@/components/ErrorModal";
 import { InputForm } from "@/components/InputForm";
 import { Loading } from "@/components/Loading";
 import { PageNumberSelector } from "@/components/PageNumberSelector";
 
-import { SearchResponse } from "@/types/api";
+import {
+  ErrorResponse,
+  SearchResponse,
+} from "@/types/api_internal";
 import { Dataset } from "@/types/ckan";
 
 import { Layout } from "@/layouts/Layout";
+import { selectStyles } from "@/styles/select";
 
 const Page: NextPage = () => {
   const router = useRouter();
   const [query, setQuery] = useState<string>("");
-  const [dataspace, setDataspace] = useState<string>("dataex"); // dataex or ids-dsc
+  const [dataspace, setDataspace] = useState<string>("ut-cadde");
   const [searchType, setSearchType] = useState<string>("meta"); // meta or detail
   const [providerID, setProviderID] = useState<string>("");
-  const [providerURL, setProviderURL] = useState<string>("");
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [displayCount, setDisplayCount] = useState<number>(10);
-  const consumerConnectorOrigin = useAppSelector(
-    (state) => state.consumerConnector.origin,
-  );
+  const [error, setError] = useState<{
+    status: number;
+    message: string;
+  } | null>(null);
+  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
   const [data, setData] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const consumerConnectorOrigin =
+    useContext(ConsumerContext).consumer.connectorUrl;
+  const { setDataset } = useContext(DatasetContext);
 
   const url = useMemo(() => {
-    if (dataspace === "dataex") {
-      if (searchType === "meta") {
-        return `/api/dataex/search/meta?q=${query}`;
-      } else {
-        return `/api/dataex/search/detail?q=${query}`;
-      }
+    if (searchType === "meta") {
+      return `/api/${dataspace}/search/meta?q=${query}`;
     } else {
-      return `/api/ids-dsc/search?q=${query}&providerURL=${providerURL}`;
+      return `/api/${dataspace}/search/detail?q=${query}`;
     }
-  }, [dataspace, searchType, query, providerURL]);
+  }, [dataspace, searchType, query]);
   const options: FetchOptions = useMemo(() => {
     if (searchType === "detail") {
       return {
@@ -68,28 +75,32 @@ const Page: NextPage = () => {
     }
   }, [searchType, providerID, consumerConnectorOrigin]);
 
-
   const fetchData = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setLoading(true);
-    
-    fetchWithRefresh(url, options)
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = (await res.json()) as { message: string };
-        throw data;
-      }
-      const data = (await res.json()) as SearchResponse;
-      setData(data);
-    })
-    .catch((error: { message: string }) => {
-      alert(error.message);
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-  }
 
+    fetchWithRefresh(url, options)
+      .then(async (res) => {
+        if (!res.ok) {
+          const status = res.status;
+          const error = (await res.json()) as ErrorResponse;
+          setError({
+            status: status,
+            message: error.message,
+          });
+          setErrorModalOpen(true);
+          throw new Error(error.message);
+        }
+        const data = (await res.json()) as SearchResponse;
+        setData(data);
+      })
+      .catch((error: Error) => {
+        console.log(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   const count = useMemo(() => {
     return data?.result.results.length || 0;
@@ -107,9 +118,12 @@ const Page: NextPage = () => {
   return (
     <>
       <Layout>
+        {errorModalOpen && error && (
+          <ErrorModal error={error} setIsOpen={setErrorModalOpen} />
+        )}
         <div className="bg-primary w-full h-40 relative">
           <div className="flex flex-row justify-start items-start h-full pt-10 pl-5">
-            <div className="text-4xl text-white font-bold font-inter">
+            <div className="text-4xl text-white font-bold">
               Search for dataset in the Dataspace
             </div>
           </div>
@@ -131,66 +145,48 @@ const Page: NextPage = () => {
                 <div className="flex flex-row justify-between flex-wrap gap-4 items-end pt-5">
                   <div className="flex flex-col items-start">
                     <div className="pl-2">dataspace</div>
-                    <Select 
+                    <Select
                       className="w-48"
-                      styles={{
-                        control: (styles) => ({
-                          ...styles,
-                          backgroundColor: "white",
-                          borderColor: "#00479D",
-                          borderRadius: "0",
-                        }),
-                      }}
+                      styles={selectStyles}
                       options={[
-                        { value: "dataex", label: "DATA-EX" },
-                        { value: "ids-dsc", label: "IDS Dataspace" },
+                        { value: "ut-cadde", label: "UT-CADDE" },
                       ]}
                       value={{ value: dataspace, label: dataspace }}
-                      onChange={(selected) => setDataspace((selected as { value: string, label: string }).value || "dataex")}
+                      onChange={(selected) =>
+                        setDataspace(
+                          (selected as { value: string; label: string })
+                            .value || "ut-cadde",
+                        )
+                      }
                     />
                   </div>
                   <div className="flex flex-col items-start">
                     <div className="pl-2">search type</div>
-                    <Select 
+                    <Select
                       className="w-48"
-                      styles={{
-                        control: (styles) => ({
-                          ...styles,
-                          backgroundColor: "white",
-                          borderColor: "#00479D",
-                          borderRadius: "0",
-                        }),
-                      }}
+                      styles={selectStyles}
                       options={[
                         { value: "meta", label: "Meta Search" },
                         { value: "detail", label: "Detail Search" },
                       ]}
                       value={{ value: searchType, label: searchType }}
-                      onChange={(selected) => setSearchType((selected as { value: string, label: string }).value || "meta")}
-                      isDisabled={dataspace === "ids-dsc"}
+                      onChange={(selected) =>
+                        setSearchType(
+                          (selected as { value: string; label: string })
+                            .value || "meta",
+                        )
+                      }
                     />
                   </div>
                   <div className="flex flex-col items-start">
-                    {dataspace === "ids-dsc" ? (
-                      <>
-                        <div className="pl-2">provider URL</div>
-                        <InputForm
-                          value={providerURL}
-                          setValue={setProviderURL}
-                          label={""}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <div className="pl-2">DATA-EX ID (Provider)</div>
-                        <InputForm
-                          value={providerID}
-                          setValue={setProviderID}
-                          disabled={searchType === "meta"}
-                          label={""}
-                        />
-                      </>
-                    )}
+                    <div className="pl-2">Provider ID</div>
+                    <InputForm
+                      value={providerID}
+                      setValue={setProviderID}
+                      disabled={searchType === "meta"}
+                      label={""}
+                      w="w-96"
+                    />
                   </div>
                   <button
                     className="bg-primary text-white w-48 h-10 font-bold shadow-md"
@@ -208,7 +204,7 @@ const Page: NextPage = () => {
             <Loading />
           ) : (
             <>
-              <div className="font-bold font-inter text-2xl pt-10">
+              <div className="font-bold text-2xl pt-10">
                 {count} datasets found
               </div>
               <div className="flex flex-col items-center pt-5">
@@ -224,44 +220,53 @@ const Page: NextPage = () => {
                 {datasets.map((dataset: Dataset, index) => (
                   <div
                     key={index}
-                    className="flex flex-col items-start border border-secondary p-5 hover:border-primary hover:bg-primary hover:bg-opacity-10 cursor-pointer group"
+                    className="flex flex-col border border-secondary p-5 hover:border-primary hover:bg-primary hover:bg-opacity-10 cursor-pointer group"
                     onClick={() => {
+                      setDataset(dataset);
                       if (searchType === "meta") {
-                        router.push(
-                          `/dataset/${findDatasetID(dataset)}?searchType=meta`,
-                        );
+                        router.push(`/dataset/${findDatasetID(dataset)}`);
                       } else {
                         router.push(
-                          `/dataset/${findDatasetID(dataset)}?searchType=detail&providerID=${providerID}`,
+                          `/dataset/${findDatasetID(dataset)}?providerID=${providerID}`,
                         );
                       }
                     }}
                   >
-                    <div className="text-primary font-bold font-inter text-2xl group-hover:border-b group-hover:border-primary">
+                    <div className="text-primary font-bold text-2xl group-hover:border-b group-hover:border-primary">
                       {dataset.title}
                     </div>
-                    <div className="font-inter text-xl">
-                      {dataset.organization.title}
-                    </div>
-                    <div className="font-inter text-md py-5">
-                      {dataset.notes}
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-5">
-                      <div className="font-inter text-md">published</div>
-                      <div className="font-inter text-md">
-                        {formatDate(new Date(dataset.metadata_created), true)}
+                    <div className="flex flex-row flex-wrap items-center justify-between">
+                      <div className="flex flex-col">
+                        <div className="text-xl">
+                          {dataset.organization.title}
+                        </div>
+                        <div className="text-md py-5">{dataset.notes}</div>
                       </div>
-                      <div className="col-span-2 border-b border-secondary" />
-                      <div className="font-inter text-md">last updated</div>
-                      <div className="font-inter text-md">
-                        {formatDate(new Date(dataset.metadata_modified), true)}
+                      <div className="flex flex-col">
+                        <div className="grid grid-cols-2 gap-x-5">
+                          <div className="text-md">published</div>
+                          <div className="text-md">
+                            {formatDate(
+                              new Date(dataset.metadata_created),
+                              true,
+                            )}
+                          </div>
+                          <div className="col-span-2 border-b border-secondary" />
+                          <div className="text-md">last updated</div>
+                          <div className="text-md">
+                            {formatDate(
+                              new Date(dataset.metadata_modified),
+                              true,
+                            )}
+                          </div>
+                          <div className="col-span-2 border-b border-secondary" />
+                          <div className="text-md">format</div>
+                          <div className="text-md">
+                            {joinFormats(extractFormats(dataset))}
+                          </div>
+                          <div className="col-span-2 border-b border-secondary" />
+                        </div>
                       </div>
-                      <div className="col-span-2 border-b border-secondary" />
-                      <div className="font-inter text-md">format</div>
-                      <div className="font-inter text-md">
-                        {joinFormats(extractFormats(dataset))}
-                      </div>
-                      <div className="col-span-2 border-b border-secondary" />
                     </div>
                   </div>
                 ))}

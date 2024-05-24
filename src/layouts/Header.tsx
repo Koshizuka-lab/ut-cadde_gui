@@ -40,7 +40,7 @@ export const Header = () => {
 
   return (
     <div className="fixed top-0 left-0  bg-white h-16 w-full z-10 flex justify-between items-center px-10 border-b border-gray">
-      <div className="text-3xl font-bold text-primary">DATA-EX</div>
+      <div className="text-3xl font-bold text-primary">UT-CADDE</div>
       {userID && (
         <div
           className="flex flex-row gap-2 items-center cursor-pointer"

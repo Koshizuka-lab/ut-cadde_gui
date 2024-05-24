@@ -2,6 +2,8 @@ import * as https from "https";
 
 import { Catalog } from "./ckan";
 
+//バックエンドから外部APIを叩く際のインターフェース
+
 export interface Options {
   method: string;
   headers:
@@ -64,4 +66,8 @@ export interface LoginErrorResponse {
     error_description: string;
   };
   status: number;
+}
+
+export interface ProvenanceResponse {
+  message: string;
 }

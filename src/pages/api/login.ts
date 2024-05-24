@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { LoginAuthResponse, LoginErrorResponse } from "@/types/api";
+import { LoginAuthResponse, LoginErrorResponse } from "@/types/api_external";
 
 import fetchHttps from "./fetchHttps";
 
