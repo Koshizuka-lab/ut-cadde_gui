@@ -10,8 +10,12 @@ export default function login(
 ) {
   const { userID, password } = req.body as { userID: string; password: string };
 
-  const client_id = "consumer1_webapp";
-  const client_secret = "X0IwpZHnuFI8uduRkM5RV5A8F1XJwF3T";
+  const client_id = process.env.CLIENT_ID;
+  const client_secret = process.env.CLIENT_SECRET;
+  if (!client_id || !client_secret) {
+    res.status(500).json({ message: "internal server error" });
+    return;
+  }
   const basic = btoa(`${client_id}:${client_secret}`);
 
   const url = process.env.AUTH_API_URL + "token";
