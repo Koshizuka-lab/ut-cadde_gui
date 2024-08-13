@@ -58,7 +58,7 @@ export const Header = () => {
           className="absolute right-6 top-16 bg-white border-b border-x border-gray"
           ref={menuRef}
         >
-          <div className="flex flex-row gap-2 items-center cursor-pointer p-3 px-5">
+          <div className="flex flex-row gap-2 items-center hover:bg-gray hover:bg-gray-10 active:bg-gray-20 cursor-pointer p-3 px-5">
             <div className="material-symbols-outlined text-alert">logout</div>
             <div
               className="text-alert text-md font-bold font-inter cursor-pointer"

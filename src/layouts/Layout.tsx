@@ -1,11 +1,13 @@
 import React from "react";
 
+
 import { Header } from "@/layouts/Header";
 import { Sidebar } from "@/layouts/Sidebar";
+import { inter } from "@/styles/fonts";
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex flex-col h-screen">
+    <div className={`flex flex-col h-screen ${inter.className}`}>
       <Header />
       <div className="flex flex-row">
         <Sidebar />

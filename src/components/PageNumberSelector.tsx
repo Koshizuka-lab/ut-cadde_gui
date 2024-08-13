@@ -90,7 +90,7 @@ export const PageNumberSelector = (props: {
               key={index}
             >
               <button
-                className="w-8 h-8 font-inter font-bold"
+                className="w-8 h-8 font-bold"
                 onClick={() => {
                   setPageNumber(num);
                 }}
@@ -120,9 +120,9 @@ export const PageNumberSelector = (props: {
         )}
       </div>
       <div className="basis-1/3 flex flex-row gap-2 items-center justify-end">
-        <div className="font-inter">Displayed Results</div>
+        <div>Displayed Results</div>
         <div className="flex flex-row relative">
-          <div className="flex flex-col justify-center items-center border border-primary w-16 h-8 font-inter">
+          <div className="flex flex-col justify-center items-center border border-primary w-16 h-8">
             {displayCount}
           </div>
           <button
@@ -145,7 +145,7 @@ export const PageNumberSelector = (props: {
                     : "hover:bg-primary hover:bg-opacity-10";
                 return (
                   <div
-                    className={`w-full h-10 flex justify-start items-center font-inter px-5 cursor-pointer ${text} ${bg} ${hover}`}
+                    className={`w-full h-10 flex justify-start items-center px-5 cursor-pointer ${text} ${bg} ${hover}`}
                     key={index}
                     onClick={() => {
                       setDisplayCount(option);

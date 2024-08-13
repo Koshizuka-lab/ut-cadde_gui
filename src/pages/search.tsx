@@ -216,7 +216,7 @@ const Page: NextPage = () => {
                 {datasets.map((dataset: Dataset, index) => (
                   <div
                     key={index}
-                    className="flex flex-col border border-secondary p-5 hover:border-primary hover:bg-primary hover:bg-opacity-10 cursor-pointer group"
+                    className="flex flex-col border border-secondary p-5 hover:border-primary hover:bg-primary hover:bg-opacity-10 active:bg-opacity-20 cursor-pointer group"
                     onClick={() => {
                       setDataset(dataset);
                       if (searchType === "meta") {

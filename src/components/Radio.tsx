@@ -17,7 +17,7 @@ export const Radio = (props: RadioProps) => {
         onChange={onChange}
         className="h-4 w-4 accent-primary"
       />
-      <label className="font-bold font-inter text-lg" htmlFor={id}>
+      <label className="font-bold text-lg" htmlFor={id}>
         {label}
       </label>
     </div>
@@ -36,7 +36,7 @@ export const RadioThin = (props: RadioProps) => {
         onChange={onChange}
         className="h-4 w-4 accent-primary"
       />
-      <label className="font-inter text-md" htmlFor={id}>
+      <label className="text-md" htmlFor={id}>
         {label}
       </label>
     </div>

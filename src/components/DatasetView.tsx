@@ -9,10 +9,10 @@ export const DatasetView = ({ dataset }: { dataset: Dataset }) => {
   const Row = ({ label, value }: { label: string; value: string }) => {
     return (
       <>
-        <div className="col-span-1 font-bold font-inter text-xl py-2">
+        <div className="col-span-1 font-bold text-xl py-2">
           {label}
         </div>
-        <div className="col-span-2 font-inter text-xl py-2">{value}</div>
+        <div className="col-span-2 text-xl py-2">{value}</div>
         <div className="col-span-3 border-b border-secondary" />
       </>
     );
@@ -20,13 +20,13 @@ export const DatasetView = ({ dataset }: { dataset: Dataset }) => {
 
   return (
     <>
-      <div className="text-primary text-3xl font-bold font-inter p-5">
+      <div className="text-primary text-3xl font-bold p-5">
         {dataset.title}
       </div>
       <div className="pt-16">
         <Section label="Description" />
       </div>
-      <div className="px-10 py-5 font-inter text-sm">{dataset.notes}</div>
+      <div className="px-10 py-5 text-sm">{dataset.notes}</div>
       <div className="pt-10">
         <Section label="Metadata" />
       </div>

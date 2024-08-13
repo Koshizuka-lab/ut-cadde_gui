@@ -51,7 +51,7 @@ const Page: NextPage = () => {
   return (
     <Layout>
       <div className="bg-white flex flex-col w-full">
-        <div className="text-primary font-bold font-inter text-3xl p-10">
+        <div className="text-primary font-bold text-3xl p-10">
           Download by Resource URL
         </div>
         <form

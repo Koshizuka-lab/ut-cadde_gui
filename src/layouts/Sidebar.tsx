@@ -8,7 +8,7 @@ const SideBox = (props: {
 }) => {
   return (
     <div
-      className="border-b border-gray w-full h-16 flex justify-start items-center pl-8 hover:bg-primary hover:bg-opacity-10 hover:border-r-4 hover:border-r-primary cursor-pointer"
+      className="border-b border-gray w-full h-16 flex justify-start items-center pl-8 hover:bg-primary hover:bg-opacity-10 hover:border-r-4 hover:border-r-primary active:bg-opacity-20 cursor-pointer"
       onClick={props.onClick}
     >
       <span className="material-symbols-outlined text-primary text-2xl pr-1">

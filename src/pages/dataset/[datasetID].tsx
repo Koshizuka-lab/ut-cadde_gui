@@ -12,6 +12,7 @@ import { formatDate } from "@/utils/formatDate";
 import { DatasetContext, ConsumerContext } from "@/hooks/useContext";
 import { FetchOptions, fetchWithRefresh } from "@/hooks/useFetch";
 
+import { Button } from "@/components/Button";
 import { DatasetView } from "@/components/DatasetView";
 import { ErrorModal } from "@/components/ErrorModal";
 import { Loading } from "@/components/Loading";
@@ -21,7 +22,6 @@ import { ErrorResponse, SearchResponse } from "@/types/api_internal";
 import { Resource } from "@/types/ckan";
 
 import { Layout } from "@/layouts/Layout";
-import { Button } from "@/components/Button";
 
 interface ResourceState {
   resource: Resource;
@@ -369,7 +369,7 @@ const Page: NextPage = () => {
             )}
             <div className="pb-5">
               <button
-                className="bg-white text-primary hover:bg-primary hover:bg-opacity-10 w-24 h-10 font-inter font-bold"
+                className="bg-white text-primary hover:bg-primary hover:bg-opacity-10 active:bg-opacity-20 w-24 h-10 font-inter font-bold"
                 onClick={() => router.back()}
               >
                 &lt; Back

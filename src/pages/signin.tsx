@@ -4,6 +4,7 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
+import { Button } from "@/components/Button";
 import { InputForm } from "@/components/InputForm";
 
 import { LoginAuthResponse } from "@/types/api_external";
@@ -81,12 +82,9 @@ const Page: NextPage = () => {
               />
             </div>
             <div className="flex justify-center items-center py-10">
-              <button
-                className="bg-primary text-white w-48 h-10 font-inter font-bold"
-                onClick={login}
-              >
+              <Button onClick={login}>
                 Sign In
-              </button>
+              </Button>
             </div>
           </div>
         </div>

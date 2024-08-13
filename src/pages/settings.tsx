@@ -21,12 +21,12 @@ const Page: NextPage = () => {
     <>
       <Layout>
         <div className="bg-white flex flex-col w-full">
-          <div className="text-primary font-bold font-inter text-3xl p-10">
+          <div className="text-primary font-bold text-3xl p-10">
             Settings
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
           <form className="flex flex-col pl-20" onSubmit={handleSubmit}>
-            <div className="font-bold font-inter text-2xl py-5">
+            <div className="font-bold text-2xl py-5">
               Consumer Connector
             </div>
             <div className="flex flex-row items-end">
