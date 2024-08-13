@@ -21,6 +21,7 @@ import { ErrorResponse, SearchResponse } from "@/types/api_internal";
 import { Resource } from "@/types/ckan";
 
 import { Layout } from "@/layouts/Layout";
+import { Button } from "@/components/Button";
 
 interface ResourceState {
   resource: Resource;
@@ -348,21 +349,19 @@ const Page: NextPage = () => {
                         })}
                       </tbody>
                     </table>
-                    <div className="flex flex-row justify-end w-full pt-5">
-                      <button
-                        className="bg-primary text-white w-36 h-12 font-inter font-bold mr-5"
-                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                        onClick={fetchData}
-                      >
+                    <div className="flex flex-row justify-end w-full pt-5 gap-5">
+                      {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+                      <Button onClick={fetchData} w="w-36" h="h-12">
                         Fetch Data
-                      </button>
-                      <button
-                        className="bg-primary text-white w-36 h-12 font-inter font-bold disabled:opacity-50"
+                      </Button>
+                      <Button
                         onClick={download}
+                        w="w-36"
+                        h="h-12"
                         disabled={disableDownload}
                       >
                         Download
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>

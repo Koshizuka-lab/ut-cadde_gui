@@ -4,6 +4,7 @@ import { useContext } from "react";
 
 import { ConsumerContext } from "@/hooks/useContext";
 
+import { Button } from "@/components/Button";
 import { InputForm } from "@/components/InputForm";
 
 import { Layout } from "@/layouts/Layout";
@@ -39,12 +40,9 @@ const Page: NextPage = () => {
               />
             </div>
             <div className="flex flex-row justify-start items-center pt-16">
-              <button
-                className="bg-primary text-white w-48 h-10 font-inter font-bold"
-                type="submit"
-              >
-                Confirm
-              </button>
+              <Button type="submit">
+                Save
+              </Button>
             </div>
           </form>
         </div>

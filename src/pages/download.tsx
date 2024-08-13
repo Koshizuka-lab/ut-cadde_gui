@@ -7,6 +7,7 @@ import { downloadFile } from "@/utils/downloadFile";
 import { ConsumerContext } from "@/hooks/useContext";
 import { fetchWithRefresh, FetchOptions } from "@/hooks/useFetch";
 
+import { Button } from "@/components/Button";
 import { InputForm } from "@/components/InputForm";
 
 import { Layout } from "@/layouts/Layout";
@@ -83,12 +84,9 @@ const Page: NextPage = () => {
             setValue={setFileName}
             required
           />
-          <button
-            className="bg-primary text-white w-48 h-10 font-inter font-bold"
-            type="submit"
-          >
+          <Button type="submit">
             Download
-          </button>
+          </Button>
         </form>
       </div>
     </Layout>

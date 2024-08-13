@@ -15,6 +15,7 @@ import { formatDate } from "@/utils/formatDate";
 import { DatasetContext, ConsumerContext } from "@/hooks/useContext";
 import { FetchOptions, fetchWithRefresh } from "@/hooks/useFetch";
 
+import { Button } from "@/components/Button";
 import { ErrorModal } from "@/components/ErrorModal";
 import { InputForm } from "@/components/InputForm";
 import { Loading } from "@/components/Loading";
@@ -188,12 +189,7 @@ const Page: NextPage = () => {
                       w="w-96"
                     />
                   </div>
-                  <button
-                    className="bg-primary text-white w-48 h-10 font-bold shadow-md"
-                    onClick={fetchData}
-                  >
-                    Search
-                  </button>
+                  <Button onClick={fetchData}>Search</Button>
                 </div>
               </form>
             </div>
