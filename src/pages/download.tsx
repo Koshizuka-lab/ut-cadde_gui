@@ -61,12 +61,14 @@ const Page: NextPage = () => {
             label="Provider ID"
             value={providerID}
             setValue={setProviderID}
+            w="w-120"
             required
           />
           <InputForm
             label="Resource URL"
             value={resourceURL}
             setValue={setResourceURL}
+            w="w-120"
             required
           />
           <InputForm

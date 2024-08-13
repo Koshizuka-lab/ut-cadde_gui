@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import fetchHttps from "../fetchHttps";
+import fetchHttps from "@/utils/fetchHttps";
 
 export default function verify(req: NextApiRequest, res: NextApiResponse) {
   // 開発環境ならば、200を返す
@@ -23,7 +23,7 @@ export default function verify(req: NextApiRequest, res: NextApiResponse) {
     data: data,
     trust_seal_id: trust_seal_id,
   };
-  const url = process.env.TRUST_API_URL + "signatures/verify";
+  const url = new URL("/signatures/verify", process.env.TRUST_API_URL as string);
   fetchHttps(url, {
     method: "GET",
     headers: headers,

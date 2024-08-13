@@ -79,10 +79,8 @@ export default async function detail(
     "x-cadde-provider": req.headers["x-cadde-provider"],
     Authorization: req.headers["authorization"],
   };
-  const url =
-    (req.headers["consumer-connector-origin"] as string) +
-    "cadde/api/v4/catalog?" +
-    query
+  const url = new URL("/cadde/api/v4/catalog", req.headers["consumer-connector-origin"] as string);
+  url.search = new URLSearchParams(query).toString();
   logger.info("search cadde catalog");
   try {
     const response = await fetchHttps(url, {

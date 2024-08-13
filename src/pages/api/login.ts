@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
+import fetchHttps from "@/utils/fetchHttps";
+
 import { LoginAuthResponse, LoginErrorResponse } from "@/types/api_external";
 
-import fetchHttps from "./fetchHttps";
 
 export default function login(
   req: NextApiRequest,
@@ -18,7 +19,7 @@ export default function login(
   }
   const basic = btoa(`${client_id}:${client_secret}`);
 
-  const url = process.env.AUTH_API_URL + "token";
+  const url = new URL("/cadde/api/v4/token", process.env.AUTH_API_URL as string);
   fetchHttps(url, {
     method: "POST",
     headers: {

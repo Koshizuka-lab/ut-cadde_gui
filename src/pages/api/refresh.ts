@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import fetchHttps from "./fetchHttps";
+import fetchHttps from "@/utils/fetchHttps";
 
 export default function refresh(req: NextApiRequest, res: NextApiResponse) {
   const { refresh_token } = req.body as { refresh_token: string };
@@ -9,7 +9,7 @@ export default function refresh(req: NextApiRequest, res: NextApiResponse) {
   const client_secret = "X0IwpZHnuFI8uduRkM5RV5A8F1XJwF3T";
   const basic = btoa(`${client_id}:${client_secret}`);
 
-  const url = process.env.AUTH_API_URL + "refresh";
+  const url = new URL("/cadde/api/v4/refresh", process.env.AUTH_API_URL as string);
   fetchHttps(url, {
     method: "POST",
     headers: {

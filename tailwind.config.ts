@@ -25,6 +25,13 @@ const config: Config = {
       fontFamily: {
         inter: ["Inter", "sans-serif"],
       },
+      width: {
+        100: "25rem",
+        120: "30rem",
+        200: "50rem",
+        300: "75rem",
+        400: "100rem",
+      },
     },
   },
   plugins: [],

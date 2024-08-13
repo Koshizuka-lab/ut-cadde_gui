@@ -95,8 +95,7 @@ export default async function download(
     });
     return;
   }
-  const url =
-    (req.headers["consumer-connector-origin"] as string) + "cadde/api/v4/file";
+  const url = new URL("/cadde/api/v4/file", req.headers["consumer-connector-origin"] as string);
   logger.info("fetch file from provider");
   try {
     const response = await fetchHttp(url, {

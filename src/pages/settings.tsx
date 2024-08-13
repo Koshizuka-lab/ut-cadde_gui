@@ -11,6 +11,10 @@ import { Layout } from "@/layouts/Layout";
 const Page: NextPage = () => {
   const { consumer, setConsumer } = useContext(ConsumerContext);
   const router = useRouter();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await router.push("/search");
+  };
 
   return (
     <>
@@ -19,7 +23,8 @@ const Page: NextPage = () => {
           <div className="text-primary font-bold font-inter text-3xl p-10">
             Settings
           </div>
-          <div className="flex flex-col pl-20">
+          {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+          <form className="flex flex-col pl-20" onSubmit={handleSubmit}>
             <div className="font-bold font-inter text-2xl py-5">
               Consumer Connector
             </div>
@@ -28,19 +33,20 @@ const Page: NextPage = () => {
                 label="consumer connector url"
                 value={consumer.connectorUrl}
                 setValue={(value) => setConsumer({ ...consumer, connectorUrl: value })}
+                w="w-200"
+                type="url"
                 required
               />
             </div>
             <div className="flex flex-row justify-start items-center pt-16">
               <button
                 className="bg-primary text-white w-48 h-10 font-inter font-bold"
-                // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                onClick={() => router.push("/search")}
+                type="submit"
               >
                 Confirm
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </Layout>
     </>
